@@ -1,7 +1,1363 @@
-<!DOCTYPE html>
 <html>
-<body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
-</body>
+
+
+<canvas id="gameCanvas" width = "450" height="700"> </canvas>
+
+
+<script>
+
+var board = Array(10)
+var minoX = 4;
+var minoY = 0;
+var	minoNet = [[-1, 0], [1, 0], [2, 0]];
+var	minoKey = 1;
+var holdMino = 8;
+var rotation = 0;
+
+var eventLog=[];
+var redoLog = [];
+var reqBag = [];
+
+var bagEdit = false;
+
+var SRSDetail = false;
+var SRSStep = 0;
+
+var exportMode = false;
+
+var exportCode ="";
+
+var bag = shuffleBag();
+
+var holdLeft = false;
+var holdRight = false;
+var holdUp = false;
+var holdDown = false;
+
+var DASLeft = 0;
+var DASRight = 0;
+var DASUp = 0;
+var DASDown = 0;
+
+var HDDelay = 0;
+
+var minoCount = [0, 0, 0, 0, 0, 0, 0,]
+
+
+window.onload = function(){
+	canvas = document.getElementById("gameCanvas");
+	canvasContext = canvas.getContext('2d');
+	initializeBoard();
+	chooseMino();
+	
+	const FPS=60;
+		
+	setInterval(function(){
+		if (bagEdit){
+			bagEditor();
+		}else{
+			move();
+			draw();
+			if(HDDelay > 0)
+				HDDelay--;
+			}
+		}, 1000/FPS);
+		
+	
+	window.addEventListener('keydown', keyPress);
+	window.addEventListener('keyup', keyUnpress);
+	
+}
+
+function debugBag(){
+	var charBag = '';
+	for( var i = 0; i < bag.length;i++){
+		charBag += nameKey(bag[bag.length - i - 1] + 1);
+	}
+	console.log(charBag);
+}
+
+
+function bagTest(num, mino){
+	
+	var countArray = [0, 0, 0, 0, 0, 0, 0];
+	for ( var i = 0; i < num; i++){
+		
+		var test = shuffleBag();
+		
+		for ( var j = 0; j < test.length; j++){
+			if ( test[j] == mino ){
+				countArray[j] = countArray[j] + 1;
+			}
+		}
+		
+	}
+	return countArray;
+
+}
+
+function initializeBoard(){
+	for (var col = 0; col < 10; col++){
+		board[col] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+	}
+}
+
+function keyPress(e){
+	if(bagEdit){
+		       if (e.keyCode == 49 || e.keyCode == 73){
+			addToBag(0);
+		
+		} else if (e.keyCode == 50 || e.keyCode == 74){
+			addToBag(1);
+		
+		} else if (e.keyCode == 51 || e.keyCode == 76){
+			addToBag(2);
+		
+		} else if (e.keyCode == 52 || e.keyCode == 79){
+			addToBag(3);
+		
+		} else if (e.keyCode == 53 || e.keyCode == 83){
+			addToBag(4);
+		
+		} else if (e.keyCode == 54 || e.keyCode == 84){
+			addToBag(5);
+		
+		} else if (e.keyCode == 55 || e.keyCode == 90){
+			addToBag(6);
+		} else if (e.keyCode == 13){ // Enter is pressed, terminate bagEdit.
+			endBagEditScratch();
+		}
+		return ;
+	}
+	
+
+	// Numbers 1-7 spawn minos.
+	if (e.keyCode == 49){
+		spawnMino(0);
+		
+	} else if (e.keyCode == 50){
+		spawnMino(1);
+		
+	} else if (e.keyCode == 51){
+		spawnMino(2);
+		
+	} else if (e.keyCode == 52){
+		spawnMino(3);
+		
+	} else if (e.keyCode == 53){
+		spawnMino(4);
+		
+	} else if (e.keyCode == 54){
+		spawnMino(5);
+		
+	} else if (e.keyCode == 55){
+		spawnMino(6);
+		
+	// Arrow keys move the minos. Up to place the mino.
+	} else if (e.keyCode == 37){
+		holdLeft = true;
+	
+	} else if (e.keyCode == 39){
+		holdRight = true;
+
+	} else if (e.keyCode == 40){
+		holdUp = true;
+	
+	} else if (e.keyCode == 38){
+		holdDown = true;
+	
+	} else if (e.keyCode == 90){
+		spinMino(false);
+	
+	} else if (e.keyCode == 88){
+		spinMino(true);
+	
+	} else if (e.keyCode == 32){
+		hardDrop();
+		HDDelay = 5;
+	
+	} else if (e.keyCode == 16){
+		hold();
+	
+	} else if (e.keyCode == 81){
+		undo();
+	
+	} else if (e.keyCode == 87){
+		redo();
+	
+	} else if (e.keyCode == 69){
+		bagEdit = true;
+	
+	} else if (e.keyCode == 48){
+		SRSDetail = true;
+	
+	} else {
+		console.log(e.keyCode); // remove after
+	
+	}
+	return;
+	
+}
+
+function bagEditor(){
+	
+	// A box overlaying the playfield.
+	drawRect(20, 20, 210, 410, "Black");
+	drawRect(22, 22, 206, 406, "White");
+	
+	canvasContext.font="15px Arial";
+	canvasContext.fillStyle = "black";
+	// Drawing the UI.
+	printLegalPieces();
+	printRequests();
+}
+
+
+function printLegalPieces(){
+
+	// Get the remaining part of the current bag. The ones among these
+	// that are not in the reqBag are the ones we are allowed to choose.
+	
+	var candidates = [0, 1, 2, 3, 4, 5, 6];
+	var legalPieces = ""
+	var numLegal = 0;
+	for (var i = 0; i < 7; i++){
+	
+		if ( legalPiece(candidates[i]) ){ // If our candidate is legal...
+			numLegal++;
+			if(legalPieces.length == 0){ // If it's the beginning of the string
+				legalPieces = nameKey(candidates[i] + 1);
+			}
+			else { // Else separate the values with a comma.
+			 
+				legalPieces += ", " + nameKey(candidates[i] + 1);
+			}
+		}
+	}
+	canvasContext.fillText("Press the associated key", 40, 50 );
+	canvasContext.fillText("to next request one of:", 50, 70 );	
+	canvasContext.fillText(legalPieces, 105 - 5 * numLegal, 90);
+	
+	canvasContext.fillText("Press enter to end the request.", 25, 400);
+}
+
+function legalPiece(mino){
+	// If we're still looking inside the first bag
+	/*
+		Let's say bag has 11. That means first bag is elements indexed 7, 8, 9, 10.
+		Index this arbitrarily as 
+		[bag.length - 1 - (bag.length % 7) ---> bag.length - 1]
+	*/
+	
+	if (reqBag.length < bag.length % 7){
+		// If it's in the reqBag it's not legal.
+		for ( var i = 0; i < reqBag.length; i++){
+			if ( reqBag[i] == mino){
+				return false;
+			}
+		}
+		// If it's not in the first bag it's not legal.
+		// [0,1,2,3,4,5,6,0,1,2,3]
+		// idx from 7->10
+		var legal = false;
+		var startIdx = bag.length - bag.length % 7
+		//if bag is 11, i from 0 -> 3
+		for ( var i = startIdx; i < bag.length; i++){
+			if (mino == bag[i]){
+				legal = true;
+			}	
+		}
+		return legal;
+	}
+	
+	//---
+
+	// Not legal if it's within the current bag being requested.
+	var startIdx = (bag.length % 7) + Math.floor ((reqBag.length - (bag.length % 7)) / 7) * 7
+	for ( var i = startIdx; i < reqBag.length; i++){
+		if (reqBag[i] == mino){
+			return false;
+		}
+	}
+	
+	return true;
+	
+}
+
+
+function printRequests(){
+	// Showing the player which pieces they've requested.
+	
+	canvasContext.fillText("You have requested: ", 30, 110 );
+	
+	var offset = 0;
+	var reqBagIdx = 0;
+	while (reqBagIdx < reqBag.length){
+		line = "";
+		var i = 0;
+		for (; i < 10 && reqBagIdx < reqBag.length; i++){
+			if( reqBagIdx != 0 && reqBagIdx % 10 != 0) line += ", ";
+			line += nameKey(reqBag[reqBagIdx] + 1);
+			reqBagIdx++;
+		}
+		canvasContext.fillText(line, 100 - 5 * i, 130 + 20*offset);
+		offset++;
+	}
+	
+}
+
+function addToBag(mino){
+	if( reqBag.length >= bag.length % 7){ // If our requests surpass our current bag
+		
+		var startIdx = (bag.length % 7) + Math.floor ((reqBag.length - (bag.length % 7)) / 7) * 7
+
+		// Don't add the mino if it's within the next requested bag.
+		for ( var i = startIdx; i < reqBag.length; i++){
+			if (reqBag[i] == mino){
+				return;
+			}
+		}
+		reqBag.push(mino);
+		return
+	}
+	else { // If our requests lie strictly within the current bag.
+		// Check to see if the requested mino is already in the requested bag.	
+		for ( var i = 0; i < reqBag.length; i++){
+			if (mino == reqBag[i]){
+				return;
+			}
+		}
+		
+		// Check to see if the requested mino is within the current bag.
+		var legalMino = false;
+		for (var i = 0; i < bag.length % 7; i++){
+			if (bag[bag.length - i - 1] == mino){
+				legalMino = true;
+			}		
+		}
+		
+		if(legalMino){
+			reqBag.push(mino);
+		}
+	}	
+}
+
+function endBagEditScratch(){
+	
+	// Filling out the bag.
+	var fillArray = []
+	for( var fillMino = 0; fillMino < 7; fillMino++){
+		if (legalPiece(fillMino)){
+			console.log(fillMino);
+			fillArray.push(fillMino);
+		}
+	}
+	
+	fillArray = shuffleArray(fillArray);
+	reqBag = reqBag.concat(fillArray);
+	
+	// Adding the reqBag to the end.
+	var i = reqBag.length - 1;
+	bag = [reqBag[i]];
+	for (i--; i >=0; i--){
+		bag.push(reqBag[i]);
+	}
+	
+	
+	if( bag.length < 5){
+		// Extend the array with a new bag.
+		bag = shuffleBag().concat(bag);
+	}
+		
+	reqBag = [];
+	bagEdit = false;
+
+}
+
+function endBagEditAlt(){
+	/*
+	Must fill out the reqBag with the remainder of the pieces needed to keep it legal.
+	Must add it to the bag backwards.
+	*/
+
+	var toAdd = [];
+	//shuffleArray(array);
+	
+	/*
+	Example where requests surpass first bag:
+        indexes = [0,1,2,3,4,5,6,  7,8,9,10]	, len = 11
+	Suppose bag = [0,1,2,3,4,5,6,  0,1,2, 3]
+	Requests = [3,2,1,0,  0,1,2,3]
+	fill out with [4,5,6]
+	
+	
+	-----
+	
+	
+	Example where requests surpass the first bag:
+	    indexes = [0,1,2,3,4,5,6,  7,8,9,10]	, len = 11
+	Suppose bag = [0,1,2,3,4,5,6,  0,1,2, 3]
+	Requests = [0,1] (implies player requested in order 1, 0 bc flipping)
+	fill out with [2,3]
+	
+	-> Must use candidates within the first bag
+	  - Candidates can be accessed as follows:
+	  - go from startIdx -> bag.len - 1 (e.g. i in range [7, 10]
+	  - startIdx = bag.len - bag.len % 7 (e.g., 11 - 4 = 7)
+	-> Check each candidate in the bag. If it's within the reqBag, don't add it.
+	  - for(candidate in bag) {
+			if (same candidate in reqBag){
+			dont add
+			}
+	
+	*/
+	
+	// When our requests do not surpass the first bag.
+	if (reqBag.length < bag.length % 7){
+		// We can only fill out our reqBag with valid candidates from the current bag.
+		//new shit here
+		var startIdx = bag.length - (bag.length % 7);
+		
+		// Go through the first bag.
+		for ( var i = startIdx; i < bag.length; i++){
+		
+		}
+		
+		
+		//old shit below
+		for (var i = bag.length - 1; i != bag.length - 1 - bag.length % 7; i--){
+			var notInReqBag = true;
+			for ( var j = 0; j < reqBag.length; j++){
+			
+				if (bag[i] == reqBag[j]){
+					j = 10; // Break out of the loop if the mino is already in reqBag.
+					notInReqBag = false;
+				}
+			}
+			if (notInReqBag){
+				toAdd.push(bag[i]);
+			}
+		}
+		
+	} else { // Our requests must surpass the first bag.
+		// Part of a fresh  7bag. Look backwards to disqualify candidates.
+		
+		// Which candidates are legal? 
+		// reqBag.len - curBag.len %7
+	}
+
+	return;
+}
+
+
+function endBagEdit(){
+	// Fill out the rest of the reqBag.
+	var candidates = shuffleBag();
+	var toAdd = []
+	// Looking at the last bag within the requested sequence.
+	var startIdx = (bag.length % 7) + Math.floor ((reqBag.length - (bag.length % 7)) / 7) * 7
+	
+	
+	// Holdmino and current mino must be excluded if the reqBag is smaller than 6.
+	
+	for (var j = 0; j < 7; j++){ // Go through every candidate.
+		var addMe = true;
+		// Fix this later. Must account for the mino in hold/in play.
+		if( (reqBag.length < 6) && ((candidates[j] == minoKey - 1) || (candidates[j] == holdMino - 1))) {
+			addMe = false;
+		}
+		for (var i = startIdx; i < reqBag.length; i++){	// If it's not in the reqBag, add it.
+			if ( reqBag[i] == candidates[j]){
+				addMe = false;
+			}
+		}
+		if(addMe) toAdd.push(candidates[j]);
+	}
+	/*
+	 Bag is built backwards. So, IJLOSTZ will come out as ZTSOLJI.
+	  
+	*/
+	for(var i = 0; i < reqBag.length;i++){
+		toAdd.push(reqBag[i]);
+	}
+	console.log("To add:");
+	console.log(toAdd);
+	bag = [];
+	for(var i = toAdd.length-1; i >= 0; i--){
+		bag.push(toAdd[i]);
+	}
+	reqBag = []
+	bagEdit = false;
+}
+
+function keyUnpress(e){
+	if (e.keyCode == 37){
+		holdLeft = false;
+		DASLeft = 0;
+	} else if (e.keyCode == 39){
+		holdRight = false;
+		DASRight = 0;
+	} else if (e.keyCode == 40){
+		holdUp = false;
+		DASUp = 0;
+	} else if (e.keyCode == 38){
+		holdDown = false;
+		DASDown = 0;
+	} else if (e.keyCode == 32){
+		HDDelay = 0;
+	}
+}
+
+function move(){
+	var DASFrames = 10;
+	if (holdLeft && (DASLeft == 0 || DASLeft > DASFrames)){
+		if (validMove(-1, 0, minoNet)) minoX--;
+	}
+	if (holdRight && (DASRight == 0 || DASRight > DASFrames)){	
+		if (validMove(1, 0, minoNet)) minoX++;
+	}
+	if (holdUp && (DASUp == 0 || DASUp > DASFrames)){
+		if (validMove(0, 1, minoNet)) minoY++;
+	}
+	if (holdDown && (DASDown == 0 || DASDown > DASFrames)){
+		if (validMove(0, -1, minoNet)) minoY--;
+	}
+	
+	if (holdLeft) DASLeft++;
+	if (holdRight) DASRight++;
+	if (holdUp) DASUp++;
+	if (holdDown) DASDown++;
+}
+
+function validMove(dX,dY, net){
+	if (!inBounds(minoX + dX, minoY + dY) || board[minoX + dX][minoY + dY]){
+		return false;
+	}
+	else{
+		for (var i = 0; i < 3; i++){
+			var x = minoX + dX + net[i][0];
+			var y = minoY + dY + net[i][1];
+			if(!inBounds(x,y) || board[x][y]) return false;
+		}
+	}
+	return true;
+}
+
+function inBounds(x, y){
+	return ( (x >= 0 && x < 10)&&( y >= 0 && y < 20) );
+}
+
+
+function draw(){
+	drawBackground();
+	drawBoard();
+	drawGhost();
+	drawMino();
+	drawGrid();
+	drawUI();
+}
+
+function drawGhost(){
+	var bottom = false;
+	var toBottom = 0;
+	while(!bottom){ // Check to see if the mino is at the bottom.
+		bottom = true;
+		if(validMove(0,toBottom, minoNet)){
+			toBottom++;
+			bottom = false;
+		}
+	}
+	toBottom--;
+	var x = minoX*25;
+	var y = (minoY + toBottom) * 25;
+	drawRect(x, y, 25, 25, "rgb(161, 161, 120)");
+	for (var n = 0; n < 3; n++){
+		drawRect(x + 25 * minoNet[n][0], y + 25 * minoNet[n][1], 25, 25, "rgb(161, 161, 120)");
+	}
+}
+
+function drawUI(){
+
+	// The Hold mino
+	canvasContext.fillStyle = "black";
+	canvasContext.font="20px Arial";
+	canvasContext.fillText("Hold: " + nameKey(holdMino),270,20);
+	
+	// The Next 5
+	
+	canvasContext.fillText("Next: " + nameKey(bag[bag.length - 1] + 1) + " " + 
+									  nameKey(bag[bag.length - 2] + 1) + " " + 
+									  nameKey(bag[bag.length - 3] + 1) + " " + 
+									  nameKey(bag[bag.length - 4] + 1) + " " + 
+									  nameKey(bag[bag.length - 5] + 1), 
+									  270, 40);
+									  
+	// Export Mode display
+	canvasContext.font="15px Arial";
+	//canvasContext.fillText("Export Mode: " + exportMode, 270, 60);
+	
+	// Detailed SRS Display
+	//canvasContext.font = "20px Arial";
+	canvasContext.fillText("Detailed SRS: " + SRSDetail, 270, 80);
+	// Control scheme
+	
+	canvasContext.font = "15px Arial";
+	canvasContext.fillText("Spawn Mino - Numbers 1 -> 7 (IJLOSTZ)", 10, 525);
+	canvasContext.fillText("Undo / Redo - Q, W", 10, 540);
+	canvasContext.fillText("Hard Drop - Space", 10, 555);
+	canvasContext.fillText("Rotate CCW / CW - Z, X", 10, 570);
+	canvasContext.fillText("Hold - Left or Right Shift", 10, 585);
+	//canvasContext.fillText("Export Mode - 0", 10, 600);
+	canvasContext.fillText("Bag arranger - E", 10, 615);
+	canvasContext.fillText("I,J,L,O,S,T,Z", 10, 630);
+	canvasContext.fillText(minoCount, 10, 645);
+	
+	
+	
+}
+
+function hold(){
+	if (holdMino == 8){ // If the hold is empty, simply set the hold and spawn a new mino.
+		holdMino = minoKey;
+		chooseMino();
+	}else{ // Otherwise, we need to swap the minos.
+		var temp = minoKey;
+		minoKey = holdMino;
+		spawnMino(minoKey - 1);
+		holdMino = temp;
+	}
+	return;
+}
+
+function nameKey(key){
+	if (key == 8){
+		return "Empty";
+	} else if (key == 7){
+		return "Z"
+	} else if (key == 6){
+		return "T"
+	} else if (key == 5){
+		return "S"
+	} else if (key == 4){
+		return "O"
+	} else if (key == 3){
+		return "L"
+	} else if (key == 2){
+		return "J"
+	} else if (key == 1){
+		return "I"
+	}
+}
+
+function drawRect(x, y, width, height, colour){
+	canvasContext.fillStyle = colour;
+	canvasContext.fillRect(x,y,width,height);
+}
+
+function drawBackground(){	
+	drawRect(0,0,canvas.width,canvas.height, "lightgray");
+}
+
+function drawMino(){
+	var x = minoX*25;
+	var y = minoY*25;
+	drawRect(x, y, 25, 25, "Black");
+	for (var n = 0; n < 3; n++){
+		drawRect(x + 25 * minoNet[n][0], y + 25 * minoNet[n][1], 25, 25, colourKey(minoKey));
+	}
+}
+
+function drawPreview(){
+
+}
+
+function drawGrid(){
+	for (var i = 0; i < 21; i++){
+		drawRect(0,i*25, 250,1,"black")
+	}
+	
+	for (var i = 0; i < 11; i++){
+		drawRect(i*25, 0, 1, 500, "black")
+	}
+	
+}
+
+function drawBoard(){
+	for (var row = 0; row < 20; row++){
+		for (var col = 0; col < 10; col++){
+			if (board[col][row] != 0){
+				drawRect(col*25, row*25, 25, 25, colourKey(board[col][row])); 
+			}
+		}		
+	}
+	
+}
+
+function shuffleArray(candidates){
+
+	for (var i = 0; i < candidates.length; i++){
+		var maxIdx = candidates.length - i;
+		var rIdx = Math.floor(Math.random() * maxIdx);
+		var temp = candidates[rIdx];
+		candidates[rIdx] = candidates[maxIdx - 1];
+		candidates[maxIdx - 1] = temp;
+	}
+	return candidates;
+}
+
+function shuffleBag(){
+
+	return shuffleArray([0, 1, 2, 3, 4, 5, 6]);
+}
+function shuffleBagOld(){
+
+	var newBag = [7,7,7,7,7,7,7];
+	for( var i = 0; i < 7; i++){
+		// Choose a random int between 0 - 6 inclusive
+		var rMino = Math.floor(Math.random() * (7)); // Random int between 0-6
+		// Check if it's in the array. If it is, choose another until it is 
+		// unique in the array.
+		var unique = false;
+		
+		while(!unique){
+			unique = true;
+			for( var j = 0; j < 7; j++){
+				if (newBag[j] == rMino){ // If it's already in the bag, reroll.
+					unique = false;
+					j = 7;
+					rMino = Math.floor(Math.random() * (7));
+					}
+			}
+		}
+		newBag[i] = rMino;
+	}
+	return newBag;
+}
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
+function chooseMino(){
+	spawnMino( bag.pop() );
+	
+	if( bag.length < 5){
+		// Extend the array with a new bag.
+		bag = shuffleBag().concat(bag);
+		}
+}
+
+function spawnMino(mino){
+	minoX = 4;
+	minoY = 1;
+	rotation = 0;
+	
+	// I J L O S T Z
+	if        (mino == 0){ // Spawn I
+		minoNet = [[-1, 0], [1, 0], [2, 0]];
+		minoKey = 1;
+	} else if (mino == 1){ // Spawn J
+		minoNet = [[-1, 0], [1, 0], [-1, -1]];	
+		minoKey = 2;
+	} else if (mino == 2){ // Spawn L
+		minoNet = [[-1, 0], [1, 0], [1, -1]];
+		minoKey = 3;
+	} else if (mino == 3){ // Spawn O
+		minoNet = [[1 ,0], [0 ,-1], [1, -1]];
+		minoKey = 4;
+	} else if (mino == 4){ // Spawn S
+		minoNet = [[-1, 0], [0, -1], [1, -1]];
+		minoKey = 5;
+	} else if (mino == 5){ // Spawn T
+		minoNet = [[-1, 0], [1, 0], [0, -1]];
+		minoKey = 6;
+	} else if (mino == 6){ // Spawn Z
+		minoNet = [[1, 0], [0, -1], [-1, -1]];
+		minoKey = 7;
+		}
+}
+
+function spinMino(CW){	
+	
+	var netClone = [[0, 0], [0, 0], [0, 0]];
+	// Copy the minoNet for SRS logic tests.
+	for (var i = 0; i < 3; i++){
+		for (var j = 0; j<2; j++){
+			netClone[i][j] = minoNet[i][j];
+		}
+	}
+
+	if (CW){
+		for (var i = 0; i < 3; i++){
+			var newX = netClone[i][1] * -1;
+			var newY = netClone[i][0];
+			netClone[i][0] = newX;
+			netClone[i][1] = newY;
+		}	
+		
+		if (SRS(netClone, CW)){
+			minoNet = netClone;
+			rotation = (rotation + 1) % 4;
+		}
+	}
+	else {
+		for (var i = 0; i < 3; i++){
+			var newX = netClone[i][1];
+			var newY = netClone[i][0] * -1;
+			netClone[i][0] = newX;
+			netClone[i][1] = newY;
+		}
+		
+		if (SRS(netClone, CW)){
+			minoNet = netClone;
+			rotation = (rotation + 3) % 4;
+		}
+	}
+	return;
+	
+}
+
+function hardDrop(){
+    HDDelay = 0;
+	if (HDDelay != 0) return;
+	saveState();
+	
+	var dropped = false;
+	
+	while(!dropped){ // Check to see if the mino is at the bottom.
+		dropped = true;
+		if(validMove(0,1, minoNet)){
+			dropped = false;
+			minoY++;
+		}
+	}
+
+	board[minoX][minoY] = minoKey;
+	for (var i = 0; i < 3; i++){
+		board[minoX + minoNet[i][0]][minoY + minoNet[i][1]] = minoKey;
+	}
+	
+	minoCount[minoKey - 1]++; // Debug info
+	clearLines();
+	chooseMino();
+}
+
+function clearLines(){
+	// For every row in the board check if it's ready to clear
+	
+	for (var row = 19; row >=0; row--){
+		var complete = true;
+		
+		for(var col = 0; col < 10; col++){
+			if (board[col][row] == 0){
+				complete = false;
+				
+			}
+		}
+		
+		if (complete){
+			shiftDown(row);
+			row++;
+		}
+		
+	}
+	return;
+}
+
+function shiftDown(row){
+	// Starting at the row where we cleared the line, copy the board above down.
+	for (; row > 0; row--){
+		for (var col = 0; col < 10; col++){
+			board[col][row] = board[col][row - 1];
+		}
+	}
+	
+	for (var col = 0; col < 10; col++){
+		board[col][0] = 0;
+	}
+}
+
+
+
+function colourKey(number){
+		if        (number == 1){
+			return "Aqua";
+		} else if (number == 2){
+			return "Blue";
+		} else if (number == 3){
+			return "Orange";
+		} else if (number == 4){
+			return "Yellow";
+		} else if (number == 5){
+			return "Lime";
+		} else if (number == 6){
+			return "DarkViolet";
+		} else if (number == 7){
+			return "Red";
+		}
+}
+
+function SRS(net, CW){
+	if ( minoKey == 1){ // Gross I piece offsets.
+		if(CW){
+			if        (rotation == 0){ // Offsets of CW rotation from spawn state.
+				if (validMove(1, 0, net)){
+					minoX++;
+					return true;
+					}
+				else if (validMove(-1, 0, net)){
+					minoX--;
+					return true;
+					}
+				else if (validMove(2, 0, net)){
+					minoX+=2;
+					return true;
+					}
+				else if (validMove(-1, 1, net)){
+					minoX--;
+					minoY++;
+					return true;
+					}
+				else if (validMove(2, -2, net)){
+					minoX+=2;
+					minoY-=2;
+					return true;
+					}			
+			
+			} else if (rotation == 1){ // Offsets of CW rotation from 1 CW state.
+				if (validMove(0, 1, net)){
+					minoY++;
+					return true;
+					}
+				else if (validMove(-1, 1, net)){
+					minoX--;
+					minoY++;
+					return true;
+					}
+				else if (validMove(2, 1, net)){
+					minoX+=2;
+					minoY++;
+					return true;
+					}
+				else if (validMove(-1, -1, net)){
+					minoX--;
+					minoY--;
+					return true;
+					}
+				else if (validMove(2, 2, net)){
+					minoX+=2;
+					minoY+=2;
+					return true;
+					}
+
+			} else if (rotation == 2){
+				if (validMove(-1, 0, net)){
+					minoX--;
+					return true;
+					}
+				else if (validMove(1, 0, net)){
+					minoX++;
+					return true;
+					}
+				else if (validMove(-2, 0, net)){
+					minoX-=2;
+					return true;
+					}
+				else if (validMove(1, -1, net)){
+					minoX++;
+					minoY--;
+					return true;
+					}
+				else if (validMove(-2, 2, net)){
+					minoX-=2;
+					minoY+=2;
+					return true;
+					}
+					
+			} else if (rotation == 3){
+				if (validMove(0, -1, net)){
+					minoY--;
+					return true;
+					}
+				else if (validMove(1, -1, net)){
+					minoX++;
+					minoY--;
+					return true;
+					}
+				else if (validMove(-2, -1, net)){
+					minoX-=2;
+					minoY--;
+					return true;
+					}
+				else if (validMove(1, 1, net)){
+					minoX++;
+					minoY++;
+					return true;
+					}
+				else if (validMove(-2, -2, net)){
+					minoX-=2;
+					minoY-=2;
+					return true;
+					}
+			}
+		} // CCW Rotations
+		else{	
+			if   (rotation == 0){
+				if (validMove(0, 1, net)){
+					minoY++;
+					return true;
+					} else if (validMove(-1, 1, net)){
+						minoX--;
+						minoY++;
+						return true;
+					} else if (validMove(2, 1, net)){
+						minoX+=2;
+						minoY++;
+						return true;
+					} else if (validMove(-1, -1, net)){
+						minoX--;
+						minoY--;
+						return true;
+					} else if (validMove(2, 2, net)){
+						minoX+=2;
+						minoY+=2;
+						return true;
+					}
+			} else if (rotation == 1){
+				if (validMove(-1, 0, net)){
+					minoX--;
+					return true;
+					} else if (validMove(1, 0, net)){
+						minoX++;
+						return true;
+					} else if (validMove(-2, 0, net)){
+						minoX-=2;
+						return true;
+					} else if (validMove(1, -1, net)){
+						minoX++;
+						minoY--;
+						return true;
+					} else if (validMove(-2, 2, net)){
+						minoX-=2;
+						minoY+=2
+						return true;
+					}
+			} else if (rotation == 2){
+				if (validMove(0, -1, net)){
+					minoY--;
+					return true;
+					} else if (validMove(1, -1, net)){
+						minoX++;
+						minoY--;
+						return true;
+					} else if (validMove(-2, -1, net)){
+						minoX-=2;
+						minoY-=1;
+						return true;
+					} else if (validMove(1, 1, net)){
+						minoX++;
+						minoY++;
+						return true;
+					} else if (validMove(-2, -2, net)){
+						minoX-=2;
+						minoY-=2;
+						return true;
+					}
+					
+			} else if (rotation == 3){
+				if (validMove(1, 0, net)){
+					minoX++;
+					return true;
+					} else if (validMove(-1, 0, net)){
+						minoX--;
+						return true;
+					} else if (validMove(2, 0, net)){
+						minoX+=2;
+						return true;
+					} else if (validMove(-1, 1, net)){
+						minoX--;
+						minoY++;
+						return true;
+					} else if (validMove(2, -2, net)){
+						minoX+=2;
+						minoY-=2;
+						return true;
+					}
+			}
+		}
+		return false;
+	}
+	
+	
+	
+	else if (minoKey == 4){ // Less gross O piece offsets.
+		if(CW){
+			if        (rotation == 0){
+				minoY--;
+			} else if (rotation == 1){
+				minoX++;
+			} else if (rotation == 2){
+				minoY++;
+			} else if (rotation == 3){
+				minoX--;
+			}
+
+		}
+		else{
+			if   (rotation == 0){
+				minoX++;
+			} else if (rotation == 1){
+				minoY++;
+			} else if (rotation == 2){
+				minoX--;
+			} else if (rotation == 3){
+				minoY--;
+			}
+		}
+		return true;
+	}
+	// J L S T Z offsets.
+	if  (validMove(0, 0, net)){
+		return true;
+	} else if (CW){
+		if (rotation == 0){ // Offsets of CW rotation from spawn state.
+			if (validMove(-1, 0, net)){
+				minoX--;
+				return true;
+			} else if (validMove(-1, -1, net)){
+				minoX--;
+				minoY--;
+				return true;
+			
+			} else if (validMove(0, 2, net)){
+				minoY+=2;
+				return true;
+				
+			} else if (validMove(-1, 2, net)){
+				minoY+=2;
+				minoX--;
+				return true;
+				
+			}
+			
+		} else if (rotation == 1){ // Offsets of CW rotation from 1 CW state.
+			if (validMove(1, 0, net)){
+				minoX++;
+				return true;
+			} else if (validMove(1, 1, net)){
+				minoX++;
+				minoY++;
+				return true;
+			
+			} else if (validMove(0, -2, net)){
+				minoY-=2;
+				return true;
+				
+			} else if (validMove(1, -2, net)){
+				minoY-=2;
+				minoX++;
+				return true;
+				
+			}
+		} else if (rotation == 2){ // Offsets of CW rotation from 2 CW state.
+			if (validMove(1, 0, net)){
+				minoX++;
+				return true;
+			} else if (validMove(1, -1, net)){
+				minoX++;
+				minoY--;
+				return true;
+			
+			} else if (validMove(0, 2, net)){
+				minoY+=2;
+				return true;
+				
+			} else if (validMove(1, 2, net)){
+				minoY+=2;
+				minoX++;
+				return true;
+				
+			}
+		} else if (rotation == 3){ // Offsets of CW rotation from 3 CW state.
+			if (validMove(-1, 0, net)){
+				minoX--;
+				return true;
+			} else if (validMove(-1, 1, net)){
+				minoX--;
+				minoY++;
+				return true;
+			
+			} else if (validMove(0, -2, net)){
+				minoY-=2;
+				return true;
+				
+			} else if (validMove(-1, -2, net)){
+				minoY-=2;
+				minoX--;
+				return true;
+				
+				}
+			}
+		} else { // CCW Rotation offsets
+		if (rotation == 0){ // Offsets of CCW rotation from spawn state.
+			if (validMove(1, 0, net)){
+				minoX++;
+				return true;
+			} else if (validMove(1, -1, net)){
+				minoX++;
+				minoY--;
+				return true;
+			
+			} else if (validMove(0, 2, net)){
+				minoY+=2;
+				return true;
+				
+			} else if (validMove(1, 2, net)){
+				minoX++;
+				minoY+=2;
+				return true;
+				
+			}
+			
+		} else if (rotation == 1){ // Offsets of CCW rotation from 1 CCW state.
+			if (validMove(1, 0, net)){
+				minoX++;
+				return true;
+			} else if (validMove(1, 1, net)){
+				minoX++;
+				minoY++;
+				return true;
+			
+			} else if (validMove(0, -2, net)){
+				minoY-=2;
+				return true;
+				
+			} else if (validMove(1, -2, net)){
+				minoY-=2;
+				minoX++;
+				return true;
+				
+			}
+		} else if (rotation == 2){ // Offsets of CCW rotation from 2 CCW state.
+			if (validMove(-1, 0, net)){
+				minoX--;
+				return true;
+			} else if (validMove(-1, -1, net)){
+				minoX--;
+				minoY--;
+				return true;
+			
+			} else if (validMove(0, 2, net)){
+				minoY+=2;
+				return true;
+				
+			} else if (validMove(-1, 2, net)){
+				minoX--;
+				minoY+=2;
+				return true;
+				
+			}
+		} else if (rotation == 3){ // Offsets of CCW rotation from 3 CCW state.
+			if (validMove(-1, 0, net)){
+				minoX--;
+				return true;
+			} else if (validMove(-1, 1, net)){
+				minoX--;
+				minoY++;
+				return true;
+			
+			} else if (validMove(0, -2, net)){
+				minoY-=2;
+				return true;
+				
+			} else if (validMove(-1, -2, net)){
+				minoY-=2;
+				minoX--;
+				return true;
+				
+				}
+			}
+		}
+}
+
+function drawSRSGhost(net, dX, dY){
+
+
+}
+
+function saveState(){
+	// Reset the redoLog to nothing since we're branching off
+	redoLog = [];
+	
+	// Push the gamestate to the eventLog. eventLog is limited to the last 96 moves.
+	if(eventLog.length > 96){
+		eventLog.shift();
+	}
+	eventLog.push( new GameState());
+
+}
+
+function GameState(){
+	this.mino = minoKey;
+	this.bag = bag.slice();
+	this.holdMino = holdMino;
+	this.board = Array(10);
+
+	for (var i = 0; i < 10; i++){
+		this.board[i] = board[i].slice();
+	}
+}
+
+function undo(){
+	
+	if (eventLog.length == 0) return;
+	
+	// Save the current state into the redoLog.
+	redoLog.push(new GameState);
+	
+	
+	var gameState = eventLog.pop();
+	minoKey = gameState.mino;
+	spawnMino(minoKey - 1);
+	holdMino = gameState.holdMino;
+	board = gameState.board;
+	bag = gameState.bag;
+	
+	// Debug info
+	minoCount[minoKey-1]--;
+	
+	
+}
+
+function redo(){
+	if (redoLog.length == 0) return;
+
+	// Save state to eventLog before redoing
+	eventLog.push( new GameState);
+	var gameState = redoLog.pop();
+
+	// Debug info
+	minoCount[minoKey - 1]++;	
+	
+	// restore state.
+	minoKey = gameState.mino;
+	spawnMino(minoKey - 1);
+	holdMino = gameState.holdMino;
+	board = gameState.board;
+	bag = gameState.bag;
+	
+	
+	
+}
+
+function preset(key) {
+	if (key == 0){
+		// Preset 1 - Held I piece
+	}
+	else{
+		// Preset 2 - Placed I piece
+	}
+}
+
+</script>
 </html>
