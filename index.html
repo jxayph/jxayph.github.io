@@ -1,8 +1,6 @@
 <html>
 
-
 <canvas id="gameCanvas" width = "450" height="700"> </canvas>
-
 
 <script>
 
@@ -558,6 +556,8 @@ function draw(){
 }
 
 function drawGhost(){
+	var xOffset = 80;
+	var yOffset = 0;
 	var bottom = false;
 	var toBottom = 0;
 	while(!bottom){ // Check to see if the mino is at the bottom.
@@ -568,37 +568,34 @@ function drawGhost(){
 		}
 	}
 	toBottom--;
-	var x = minoX*25;
-	var y = (minoY + toBottom) * 25;
+	var x = minoX*25 + xOffset;
+	var y = (minoY + toBottom) * 25 + yOffset;
 	drawRect(x, y, 25, 25, "rgb(161, 161, 120)");
 	for (var n = 0; n < 3; n++){
 		drawRect(x + 25 * minoNet[n][0], y + 25 * minoNet[n][1], 25, 25, "rgb(161, 161, 120)");
 	}
 }
 
-function drawUI(){
-
-	// The Hold mino
+function drawUI(){	
+	drawHold();
+	drawPreview();
 	canvasContext.fillStyle = "black";
-	canvasContext.font="20px Arial";
-	canvasContext.fillText("Hold: " + nameKey(holdMino),270,20);
 	
-	// The Next 5
-	
-	canvasContext.fillText("Next: " + nameKey(bag[bag.length - 1] + 1) + " " + 
+	// The Next 
+	/*canvasContext.fillText("Next: " + nameKey(bag[bag.length - 1] + 1) + " " + 
 									  nameKey(bag[bag.length - 2] + 1) + " " + 
 									  nameKey(bag[bag.length - 3] + 1) + " " + 
 									  nameKey(bag[bag.length - 4] + 1) + " " + 
 									  nameKey(bag[bag.length - 5] + 1), 
-									  270, 40);
-									  
+									  260, 130);
+	*/								  
 	// Export Mode display
 	canvasContext.font="15px Arial";
 	//canvasContext.fillText("Export Mode: " + exportMode, 270, 60);
 	
 	// Detailed SRS Display
 	//canvasContext.font = "20px Arial";
-	canvasContext.fillText("Detailed SRS: " + SRSDetail, 270, 80);
+	//canvasContext.fillText("Detailed SRS: " + SRSDetail, 270, 80);
 	// Control scheme
 	
 	canvasContext.font = "15px Arial";
@@ -614,6 +611,35 @@ function drawUI(){
 	
 	
 	
+}
+
+function drawPreview(){
+
+	var tempOffset = 25;
+	var x = 340;
+	var y = 10+tempOffset;
+	var numPreviews = 5;
+	
+	var scale = 100
+	drawBox(x, y, scale, scale, 2,"black", "gray");
+	drawMini(scale / 4, x, y, bag[bag.length-1] + 1);
+	
+	y += 1.1*scale;
+	scale = 78;
+	
+	for ( var i = 1; i < numPreviews; i++){
+		drawBox(x, y, scale, scale, 2,"black", "gray");
+		drawMini(scale / 4, x, y, bag[bag.length - 1 - i] + 1);
+		y += 1.1 * scale;
+	
+	}
+	
+	
+	
+	canvasContext.fillStyle = "black";
+	canvasContext.font="20px Arial";
+	canvasContext.fillText("Next:",340,30);
+
 }
 
 function hold(){
@@ -659,34 +685,126 @@ function drawBackground(){
 }
 
 function drawMino(){
-	var x = minoX*25;
-	var y = minoY*25;
+
+	var xOffset = 80;
+	var yOffset = 0;
+	var x = minoX*25 + xOffset;
+	var y = minoY*25 + yOffset;
 	drawRect(x, y, 25, 25, "Black");
 	for (var n = 0; n < 3; n++){
 		drawRect(x + 25 * minoNet[n][0], y + 25 * minoNet[n][1], 25, 25, colourKey(minoKey));
 	}
 }
 
-function drawPreview(){
+function drawHold(){
+	var tempOffset = 15;
+	var x = 6;
+	var y = 10+tempOffset;
+	
+	var scale = 68
+	drawBox(x, y, scale, scale, 2,"black", "gray");
+	drawMini(scale / 4, x, y, holdMino);
+	
+	canvasContext.fillStyle = "black";
+	canvasContext.font="20px Arial";
+	canvasContext.fillText("Hold:",x,y-5);
+}
 
+function drawMini(scale, x, y, mino){
+	scale *= 0.9;
+	x += scale*0.2;
+	y += scale*0.2;
+	if(mino == 8) return;
+	[x,y] = findCenter(scale, x, y, mino);
+	
+	
+	drawRect(x, y, scale, scale, colourKey(mino));
+	var thisNet = getMinoNet(mino-1);
+	for (var n = 0; n < 3; n++){
+		drawRect(x + scale * thisNet[n][0], y + scale * thisNet[n][1], scale, scale, colourKey(mino));
+	}
+	
+	
+}
+
+function getMinoNet(mino){
+	
+	if        (mino == 0){
+		return ([[-1, 0], [1, 0], [2, 0]]);
+		
+	} else if (mino == 1){
+		return ([[-1, 0], [1, 0], [-1, -1]]);	
+		
+	} else if (mino == 2){
+		return ([[-1, 0], [1, 0], [1, -1]]);
+		
+	} else if (mino == 3){
+		return ([[1 ,0], [0 ,-1], [1, -1]]);
+		
+	} else if (mino == 4){
+		return ([[-1, 0], [0, -1], [1, -1]]);
+		
+	} else if (mino == 5){
+		return ([[-1, 0], [1, 0], [0, -1]]);
+		
+	} else if (mino == 6){
+		return ([[1, 0], [0, -1], [-1, -1]]);
+		}
+}
+
+function findCenter(scale, x, y, mino){
+	mino -= 1;
+	if        (mino == 0){
+		return ([x + scale, y + 1.5*scale ]);
+		
+	} else if (mino == 1){
+		return ([x + 1.5*scale, y + 2*scale]);
+		
+	} else if (mino == 2){
+		return ([x + 1.5*scale, y + 2*scale]);
+		
+	} else if (mino == 3){
+		return ([x + scale, y + 2*scale]);
+		
+	} else if (mino == 4){
+		return ([x + 1.5*scale, y + 2*scale]);
+		
+	} else if (mino == 5){
+		return ([x + 1.5*scale, y + 2*scale]);
+		
+	} else if (mino == 6){
+		return ([x + 1.5*scale, y + 2*scale]);
+		}
+}
+
+function drawBox(x, y, width, height, borderWidth, clr1, clr2){
+	drawRect(x,y,width, height, clr1);
+	drawRect(x + borderWidth,y + borderWidth, width - 2*borderWidth, height - 2*borderWidth, clr2);
 }
 
 function drawGrid(){
+	
+	var xOffset = 80;
+	var yOffset = 0;
+
 	for (var i = 0; i < 21; i++){
-		drawRect(0,i*25, 250,1,"black")
+		drawRect(0 + xOffset,i*25, 250,1,"black")
 	}
 	
 	for (var i = 0; i < 11; i++){
-		drawRect(i*25, 0, 1, 500, "black")
+		drawRect(i*25 + xOffset, 0, 1, 500, "black")
 	}
 	
 }
 
 function drawBoard(){
+
+	var xOffset = 80;
+	var yOffset = 0;
 	for (var row = 0; row < 20; row++){
 		for (var col = 0; col < 10; col++){
 			if (board[col][row] != 0){
-				drawRect(col*25, row*25, 25, 25, colourKey(board[col][row])); 
+				drawRect(col*25 + xOffset, row*25, 25, 25, colourKey(board[col][row])); 
 			}
 		}		
 	}
