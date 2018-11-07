@@ -17,6 +17,11 @@ function inBounds(x, y){
 	return ( (x >= 0 && x < 10)&&( y >= 0 && y < 20) );
 }
 
+function validBlock(x, y){
+	if (inBounds(x, y) && (board[x][y] == 0)) return true;
+	else return false;
+}
+
 function shuffleArray(candidates){
 
 	for (var i = 0; i < candidates.length; i++){

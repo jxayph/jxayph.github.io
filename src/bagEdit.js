@@ -1,3 +1,11 @@
+/*
+ 7-bag randomizer legal bag editor. Tracks which upcoming minos are 7bag legal, and only 
+ allows the user to build a bag with 7-bag legal minos (no 2 of the same minos within a set of 7)
+*/
+
+var reqBag = [];
+var bagEdit = false;
+
 function bagEditor(){
 	
 	// A box overlaying the playfield.
@@ -15,20 +23,18 @@ function printLegalPieces(){
 
 	// Get the remaining part of the current bag. The ones among these
 	// that are not in the reqBag are the ones we are allowed to choose.
-	
-	var candidates = [0, 1, 2, 3, 4, 5, 6];
 	var legalPieces = ""
 	var numLegal = 0;
 	for (var i = 0; i < 7; i++){
 	
-		if ( legalPiece(candidates[i]) ){ // If our candidate is legal...
+		if ( legalPiece(i) ){ // If our candidate is legal...
 			numLegal++;
 			if(legalPieces.length == 0){ // If it's the beginning of the string
-				legalPieces = nameKey(candidates[i] + 1);
+				legalPieces = nameKey(i + 1);
 			}
 			else { // Else separate the values with a comma.
 			 
-				legalPieces += ", " + nameKey(candidates[i] + 1);
+				legalPieces += ", " + nameKey(i + 1);
 			}
 		}
 	}
@@ -47,13 +53,17 @@ function legalPiece(mino){
 		[bag.length - 1 - (bag.length % 7) ---> bag.length - 1]
 	*/
 	
-	if (reqBag.length < bag.length % 7){
+	if (reqBag.length - 1 < bag.length % 7){
+		
 		// If it's in the reqBag it's not legal.
 		for ( var i = 0; i < reqBag.length; i++){
 			if ( reqBag[i] == mino){
 				return false;
 			}
 		}
+		
+		if(mino == minoKey - 1) return true; // current mino is legal
+		
 		// If it's not in the first bag it's not legal.
 		// [0,1,2,3,4,5,6,0,1,2,3]
 		// idx from 7->10
@@ -65,13 +75,14 @@ function legalPiece(mino){
 				legal = true;
 			}	
 		}
+
 		return legal;
 	}
 	
 	//---
 
 	// Not legal if it's within the current bag being requested.
-	var startIdx = (bag.length % 7) + Math.floor ((reqBag.length - (bag.length % 7)) / 7) * 7
+	var startIdx = (bag.length % 7) + 1 + Math.floor ((reqBag.length - (bag.length % 7)) / 7) * 7
 	for ( var i = startIdx; i < reqBag.length; i++){
 		if (reqBag[i] == mino){
 			return false;
@@ -127,6 +138,7 @@ function addToBag(mino){
 		
 		// Check to see if the requested mino is within the current bag.
 		var legalMino = false;
+		if ( mino == minoKey - 1 ) legalMino = true;
 		for (var i = 0; i < bag.length % 7; i++){
 			if (bag[bag.length - i - 1] == mino){
 				legalMino = true;
@@ -145,7 +157,6 @@ function endBagEdit(){
 	var fillArray = []
 	for( var fillMino = 0; fillMino < 7; fillMino++){
 		if (legalPiece(fillMino)){
-			console.log(fillMino);
 			fillArray.push(fillMino);
 		}
 	}
@@ -168,6 +179,7 @@ function endBagEdit(){
 		
 	reqBag = [];
 	bagEdit = false;
+	chooseMino();
 
 }
 

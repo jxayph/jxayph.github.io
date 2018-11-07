@@ -1,3 +1,68 @@
+var detailNetClone = [[0, 0], [0, 0], [0, 0]];
+var detailOffsets = [];
+var detailStage = 0;
+var detailCW = null;
+var detailStepping = false;
+
+function stepThroughSRS(){
+	var dX = detailOffsets[detailStage][0];
+	var dY = detailOffsets[detailStage][1]
+	
+	detailStage++;//incomplete, consolelog is wrong
+	
+	// at the end
+	if( detailStage == detailOffsets.length || offsetTest(dX, dY, detailNetClone)){
+		finishStepThrough();
+	}
+}
+
+function finishStepThrough(){
+		detailNetClone = [[0, 0], [0, 0], [0, 0]];
+		detailOffsets = [];
+		detailStage = 0;
+		detailStepping = false;
+		spinMino(detailCW);
+}
+
+function detailedSpinMino(CW){
+	
+	if(minoKey == 4){
+		finishStepThrough();
+		return;
+	}
+	// Copy the minoNet for SRS logic tests.
+	for (var i = 0; i < 3; i++){
+		for (var j = 0; j<2; j++){
+			detailNetClone[i][j] = minoNet[i][j];
+		}
+	}
+
+	if (CW){
+		for (var i = 0; i < 3; i++){
+			var newX = detailNetClone[i][1] * -1;
+			var newY = detailNetClone[i][0];
+			detailNetClone[i][0] = newX;
+			detailNetClone[i][1] = newY;
+		}	
+	}
+	else {
+		for (var i = 0; i < 3; i++){
+			var newX = detailNetClone[i][1];
+			var newY = detailNetClone[i][0] * -1;
+			detailNetClone[i][0] = newX;
+			detailNetClone[i][1] = newY;
+		}
+	}
+	detailCW = CW;
+	detailStepping = true;
+	SRS(detailNetClone, detailCW); // Set the offsets array
+	stepThroughSRS();
+	return;
+	
+
+	
+}
+
 
 function spinMino(CW){	
 	
@@ -41,8 +106,6 @@ function spinMino(CW){
 
 function offsetTest(dX, dY, net){
 	if (validMove(dX, dY, net)){
-		minoX += dX;
-		minoY += dY;
 		return true;
 	}
 }
@@ -143,15 +206,19 @@ function SRS(net, CW){
 			
 			}
 		}
-				for ( var i = 0; i < offsets.length; i++){
-					console.log(offsets);
-					console.log(offsets.length);
-					if ( offsetTest( offsets[i][0], offsets[i][1], net) ) return true;
-				}
-				return false;	
-}
-
-function drawSRSGhost(net, dX, dY){
-
-
+	if(detailStepping){
+		detailOffsets = offsets;
+		return false;
+	}
+	
+	for ( var i = 0; i < offsets.length; i++){
+		var dX = offsets[i][0];
+		var dY = offsets[i][1];
+		if ( offsetTest( dX, dY, net) ){
+			minoX += dX;
+			minoY += dY;
+			return true;
+		}
+	}
+	return false;	
 }

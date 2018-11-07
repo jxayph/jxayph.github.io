@@ -2,9 +2,11 @@
 function draw(){	
 	drawBackground();
 	drawBoard();
-	if (!noGhost) drawGhost();
+	
+	if (!noGhost & !detailStepping) drawGhost();
 	drawMino();
 	drawGrid();
+	if (detailStepping && minoKey != 4) drawSRSGhost();
 	drawUI();
 }
 
@@ -70,7 +72,7 @@ function drawUI(){
 	canvasContext.font="15px Arial";	
 	// Detailed SRS Display
 	//canvasContext.font = "20px Arial";
-	//canvasContext.fillText("Detailed SRS: " + SRSDetail, 270, 80);
+	
 	// Control scheme
 	
 	canvasContext.font = "15px Arial";
@@ -78,10 +80,12 @@ function drawUI(){
 	canvasContext.fillText("Undo / Redo - Q, W", 10, 540);
 	canvasContext.fillText("Hard Drop - Space", 10, 555);
 	canvasContext.fillText("Rotate CCW / CW - Z, X", 10, 570);
-	canvasContext.fillText("Hold - Left or Right Shift", 10, 585);
+	canvasContext.fillText("Hold - Shift", 10, 585);
 	canvasContext.fillText("Bag arranger - E", 10, 600);
-	canvasContext.fillText("I,J,L,O,S,T,Z", 10, 630);
-	canvasContext.fillText(minoCount, 10, 645);	
+	canvasContext.fillText("Detailed SRS Toggle - S |  " + detailedSRS, 10, 615);
+	canvasContext.fillText("Toggle Ghost - A", 10, 630);
+	canvasContext.fillText("I,J,L,O,S,T,Z", 10, 680);
+	canvasContext.fillText(minoCount, 10, 695);	
 }
 
 function drawMino(){
@@ -128,5 +132,29 @@ function drawGhost(){
 	drawRect(x, y, 25, 25, "rgb(161, 161, 120)");
 	for (var n = 0; n < 3; n++){
 		drawRect(x + 25 * minoNet[n][0], y + 25 * minoNet[n][1], 25, 25, "rgb(161, 161, 120)");
+	}
+}
+
+function drawSRSGhost(){
+	
+	var dX = detailOffsets[detailStage][0];
+	var dY = detailOffsets[detailStage][1];
+	
+	
+	canvasContext.font = "15px Arial";
+	canvasContext.fillText("Testing offset " + (detailStage), 300, 525);
+	canvasContext.fillText("dX: " + dX + " dY: " + -1*dY, 300, 540);
+	canvasContext.fillText("Press ENTER to skip", 300, 555);
+	
+	
+	var xOffset = 80;
+	var yOffset = 0;
+	var x = (minoX+dX)*25 + xOffset;
+	var y = (minoY+dY)*25 + yOffset;
+	if (validBlock(minoX + dX, minoY + dY) ) drawRect(x, y, 25, 25, "lightgreen");
+	else drawRect(x, y, 25, 25, "darkred");
+	for (var n = 0; n < 3; n++){
+		if (validBlock(minoX + dX + detailNetClone[n][0], minoY + dY + detailNetClone[n][1])) drawRect(x + 25 * (detailNetClone[n][0]), y + 25 * (detailNetClone[n][1]), 25, 25, "lightgreen");
+		else drawRect(x + 25 * (detailNetClone[n][0]), y + 25 * (detailNetClone[n][1]), 25, 25, "darkred");
 	}
 }

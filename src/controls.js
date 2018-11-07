@@ -4,6 +4,13 @@ var holdUp = false;
 var holdDown = false;
 
 
+var DASLeft = 0;
+var DASRight = 0;
+var DASUp = 0;
+var DASDown = 0;
+
+var HDDelay = 0;
+
 
 function move(){
 	var DASFrames = 7;
@@ -33,6 +40,12 @@ function move(){
 
 
 function keyPress(e){
+	
+	if (detailStepping){
+		if (e.keyCode == 13) detailStage = detailOffsets.length -1
+		stepThroughSRS();
+		return;
+	}
 	if(bagEdit){
 		       if (e.keyCode == 49 || e.keyCode == 73){
 			addToBag(0);
@@ -97,10 +110,12 @@ function keyPress(e){
 		holdDown = true;
 	
 	} else if (e.keyCode == 90){
-		spinMino(false);
+		if(detailedSRS) detailedSpinMino(false);
+		else spinMino(false);
 	
 	} else if (e.keyCode == 88){
-		spinMino(true);
+		if (detailedSRS) detailedSpinMino(true);
+		else spinMino(true);
 	
 	} else if (e.keyCode == 32){
 		hardDrop();
@@ -118,8 +133,11 @@ function keyPress(e){
 	} else if (e.keyCode == 69){
 		bagEdit = true;
 	
-	} else if (e.keyCode == 48){
-		SRSDetail = true;
+	} else if (e.keyCode == 83){
+		detailedSRS = !detailedSRS;
+	
+	} else if (e.keyCode == 65){
+		noGhost = !noGhost;
 	
 	} else {
 		console.log(e.keyCode); // remove after

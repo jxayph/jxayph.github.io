@@ -1,3 +1,5 @@
+var eventLog=[];
+var redoLog = [];
 
 function saveState(){
 	// Reset the redoLog to nothing since we're branching off

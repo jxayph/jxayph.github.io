@@ -16,28 +16,11 @@
 
 var noGhost = false;
 
-var eventLog=[];
-var redoLog = [];
-var reqBag = [];
-
-var bagEdit = false;
-
-var SRSDetail = false;
+var detailedSRS = false;
 var offsetArray = [];
 var SRSStep = 0;
 
 var bag = shuffleBag();
-
-
-var DASLeft = 0;
-var DASRight = 0;
-var DASUp = 0;
-var DASDown = 0;
-
-var HDDelay = 0;
-
-var minoCount = [0, 0, 0, 0, 0, 0, 0,]
-
 
 window.onload = function(){
 	canvas = document.getElementById("gameCanvas");

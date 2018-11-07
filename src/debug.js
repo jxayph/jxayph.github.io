@@ -1,4 +1,6 @@
 
+var minoCount = [0, 0, 0, 0, 0, 0, 0,]
+
 function debugBag(){
 	var charBag = '';
 	for( var i = 0; i < bag.length;i++){
