@@ -10,6 +10,7 @@ Modern Tetris simulator with added features for practicing techniques for multip
  - SRS Wallkick Illustrator
  - Mino picker
  - Full keyboard controls
+ - Customizable controls
 
 Planned:
  - Export/Import gamestates
