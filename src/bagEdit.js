@@ -9,8 +9,8 @@ var bagEdit = false;
 function bagEditor(){
 	
 	// A box overlaying the playfield.
-	drawRect(100, 20, 210, 410, "Black");
-	drawRect(102, 22, 206, 406, "White");
+	drawRect(20, 20, 210, 410, "Black");
+	drawRect(22, 22, 206, 406, "White");
 	
 	canvasContext.font="15px Arial";
 	canvasContext.fillStyle = "black";
@@ -38,12 +38,11 @@ function printLegalPieces(){
 			}
 		}
 	}
-	canvasContext.fillText("Press the associated key", 120, 50 );
-	canvasContext.fillText("to next request one of:", 130, 70 );	
-	canvasContext.fillText(legalPieces, 185 - 5 * numLegal, 90);
+	canvasContext.fillText("Press the associated key", 40, 50 );
+	canvasContext.fillText("to next request one of:", 50, 70 );	
+	canvasContext.fillText(legalPieces, 105 - 5 * numLegal, 90);
 	
-	canvasContext.fillText("Press enter to end the request.", 105, 380);
-	canvasContext.fillText("Press escape to exit.", 135, 400);
+	canvasContext.fillText("Press enter to end the request.", 25, 400);
 }
 
 function legalPiece(mino){
@@ -97,7 +96,7 @@ function legalPiece(mino){
 function printRequests(){
 	// Showing the player which pieces they've requested.
 	
-	canvasContext.fillText("You have requested: ", 130, 110 );
+	canvasContext.fillText("You have requested: ", 30, 110 );
 	
 	var offset = 0;
 	var reqBagIdx = 0;
@@ -109,7 +108,7 @@ function printRequests(){
 			line += nameKey(reqBag[reqBagIdx] + 1);
 			reqBagIdx++;
 		}
-		canvasContext.fillText(line, 180 - 5 * i, 130 + 20*offset);
+		canvasContext.fillText(line, 100 - 5 * i, 130 + 20*offset);
 		offset++;
 	}
 	

@@ -11,14 +11,6 @@ var DASDown = 0;
 
 var HDDelay = 0;
 
-var mouseX = 0;
-var mouseY = 0;
-
-var controlsMenu = false;
-
-var keyBindIndex = 0;
-var setKeyBind = false;
-var keyBinds = [37, 39, 40, 38, 90, 88, 16, 32, 81, 87, 69, 83, 65]
 
 function move(){
 	var DASFrames = 7;
@@ -48,28 +40,6 @@ function move(){
 
 
 function keyPress(e){
-	console.log(e.keyCode + " " + getKeyNameFromCode(e.keyCode));
-	
-	if(controlsMenu){
-		
-		if(setKeyBind){
-			console.log("Set key " + e.keyCode);
-			keyBinds[keyBindIndex] = e.keyCode;
-			setKeyBind = false;
-			return;
-		}
-		
-		if(e.keyCode == 27){
-			controlsMenu = false;
-		} else if (e.keyCode == 38){ // menu down
-			keyBindIndex = (keyBindIndex + 12) % 13
-		} else if (e.keyCode == 40){ // menu up
-			keyBindIndex = (keyBindIndex + 14) % 13
-		} else if (e.keyCode == 39){
-			setKeyBind = true;
-		}
-		return;
-	}
 	
 	if (detailStepping){
 		if (e.keyCode == 13) detailStage = detailOffsets.length -1
@@ -126,51 +96,48 @@ function keyPress(e){
 	} else if (e.keyCode == 55){
 		spawnMino(6);
 		
-	// Arrow keys move the minos by default. keybinds[0-6]
-	} else if (e.keyCode == keyBinds[0]){
+	// Arrow keys move the minos. Up to place the mino.
+	} else if (e.keyCode == 37){
 		holdLeft = true;
 	
-	} else if (e.keyCode == keyBinds[1]){
+	} else if (e.keyCode == 39){
 		holdRight = true;
 
-	} else if (e.keyCode == keyBinds[2]){
+	} else if (e.keyCode == 40){
 		holdUp = true;
 	
-	} else if (e.keyCode == keyBinds[3]){
+	} else if (e.keyCode == 38){
 		holdDown = true;
 	
-	} else if (e.keyCode == keyBinds[4]){ // z and x for rotations by default.
+	} else if (e.keyCode == 90){
 		if(detailedSRS) detailedSpinMino(false);
 		else spinMino(false);
 	
-	} else if (e.keyCode == keyBinds[5]){
+	} else if (e.keyCode == 88){
 		if (detailedSRS) detailedSpinMino(true);
 		else spinMino(true);
 	
-	} else if (e.keyCode == keyBinds[6]){ // shift for hold
-		hold();
-	
-	} else if (e.keyCode == keyBinds[7]){ // space bar for harddrop
+	} else if (e.keyCode == 32){
 		hardDrop();
 		HDDelay = 5;
 	
-	} else if (e.keyCode == keyBinds[8]){//q, w for undo redo
+	} else if (e.keyCode == 16){
+		hold();
+	
+	} else if (e.keyCode == 81){
 		undo();
 	
-	} else if (e.keyCode == keyBinds[9]){
+	} else if (e.keyCode == 87){
 		redo();
 	
-	} else if (e.keyCode == keyBinds[10]){
+	} else if (e.keyCode == 69){
 		bagEdit = true;
 	
-	} else if (e.keyCode == keyBinds[11]){
+	} else if (e.keyCode == 83){
 		detailedSRS = !detailedSRS;
 	
-	} else if (e.keyCode == keyBinds[12]){
+	} else if (e.keyCode == 65){
 		noGhost = !noGhost;
-		
-	} else if (e.keyCode == 192){
-		setControls();
 	
 	} else {
 		console.log(e.keyCode); // remove after
@@ -180,54 +147,20 @@ function keyPress(e){
 	
 }
 
-//todo: fix this with keyBinds
 function keyUnpress(e){
-	if (e.keyCode == keyBinds[0]){
+	if (e.keyCode == 37){
 		holdLeft = false;
 		DASLeft = 0;
-	} else if (e.keyCode == keyBinds[1]){
+	} else if (e.keyCode == 39){
 		holdRight = false;
 		DASRight = 0;
-	} else if (e.keyCode == keyBinds[2]){
+	} else if (e.keyCode == 40){
 		holdUp = false;
 		DASUp = 0;
-	} else if (e.keyCode == keyBinds[3]){
+	} else if (e.keyCode == 38){
 		holdDown = false;
 		DASDown = 0;
-	} else if (e.keyCode == keyBinds[7]){
+	} else if (e.keyCode == 32){
 		HDDelay = 0;
 	}
-	
 }
-
-
-function onClick(e){
-	console.log(mouseX);
-	console.log(mouseY);
-	
-	for( var i = 0; i < buttons.length; i++){
-		if (buttons[i].testClick()) return;
-	}
-	
-}
-function calculateMousePos(e){
-	var rect = canvas.getBoundingClientRect();
-	var root = document.documentElement;
-	var mouseX = e.clientX - rect.left - root.scrollLeft;
-	var mouseY = e.clientY - rect.top - root.scrollTop;
-	return {
-		x:mouseX,
-		y:mouseY
-	};
-}
-
-function setControls(){
-	console.log("Set controls");
-	
-	var keyBindIndex = 0;
-	var setKeyBind = false;
-	
-	
-	controlsMenu = true;
-}
-

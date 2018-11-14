@@ -11,7 +11,6 @@
 <script src="src/graphics.js"></script>
 <script src="src/minoPreviews.js"></script>
 <script src="src/rotations.js"></script>
-<script src="src/button.js"></script>
 
 <script>
 
@@ -23,13 +22,10 @@ var SRSStep = 0;
 
 var bag = shuffleBag();
 
-var buttons = [];
-
 window.onload = function(){
 	canvas = document.getElementById("gameCanvas");
 	canvasContext = canvas.getContext('2d');
 	initializeBoard();
-	initializeButtons()
 	chooseMino();
 	
 	const FPS=60;
@@ -47,14 +43,7 @@ window.onload = function(){
 	
 	window.addEventListener('keydown', keyPress);
 	window.addEventListener('keyup', keyUnpress);
-
-	canvas.addEventListener('mousedown',onClick);
-	canvas.addEventListener('mousemove',
-		function(e){
-			var mousePos = calculateMousePos(e);
-			mouseX=mousePos.x;
-			mouseY=mousePos.y;
-		});
+	
 }
 
 </script>

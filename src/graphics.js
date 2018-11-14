@@ -2,21 +2,12 @@
 function draw(){	
 	drawBackground();
 	drawBoard();
-	drawButtons();
 	
 	if (!noGhost & !detailStepping) drawGhost();
-	
 	drawMino();
 	drawGrid();
-	
 	if (detailStepping && minoKey != 4) drawSRSGhost();
-	
 	drawUI();
-	
-	if (controlsMenu){
-		drawSetControlsDisplay();	
-	}
-	
 }
 
 function drawBox(x, y, width, height, borderWidth, clr1, clr2){
@@ -166,118 +157,4 @@ function drawSRSGhost(){
 		if (validBlock(minoX + dX + detailNetClone[n][0], minoY + dY + detailNetClone[n][1])) drawRect(x + 25 * (detailNetClone[n][0]), y + 25 * (detailNetClone[n][1]), 25, 25, "lightgreen");
 		else drawRect(x + 25 * (detailNetClone[n][0]), y + 25 * (detailNetClone[n][1]), 25, 25, "darkred");
 	}
-}
-
-function drawButtons(){
-	for (var i = 0; i < buttons.length; i++){
-		buttons[i].draw();
-	}
-}
-
-function drawControlsMenu(){
-	var x = 100;
-	var y = 20;
-	var width = 210;
-	
-	drawRect(x, y, width, 450, "Black");
-	drawRect(x + 2, y+2, 206, 446, "White");
-	
-	
-	// Draw the highlight on a menu item
-	drawRect(x + 2 + 129*setKeyBind, y + 31 + 30*keyBindIndex, 10, 29, "red");
-	
-	canvasContext.font = "25px Arial";
-	drawRect(x, y + 30, width, 2, "Black");
-	canvasContext.fillText("Controls :", x + 10, y + 25);
-	
-	canvasContext.font = "10px Arial";
-	canvasContext.fillText("Right arrow to", x + 130, y + 15);
-	canvasContext.fillText("assign key", x + 130, y + 25);
-	canvasContext.font = "18px Arial";	
-	var keyBindNames = ["Move left ",
-						"Move right",
-						"Soft drop ",
-						"Move up   ",
-						"Rotate CCW",
-						"Rotate CW ",
-						"Hold mino ",
-						"Hard drop ",
-						"Undo      ",
-						"Redo      ",
-						"Bag editor",
-						"SRS detail",
-						"Show ghost"]; //[0-7]
-						
-						
-	var dY = 30;
-	for (var i = 0; i < 13; i++){
-		drawRect(x, y + 60 + i*dY, width, 1, "Black");
-		canvasContext.fillText(keyBindNames[i], x + 20, y + 55 + i*dY);
-		canvasContext.fillText(getKeyNameFromCode(keyBinds[i]), x + 140, y + 55 + i*dY);
-		
-	}
-	
-	drawRect (x + 130, y + 30, 1, 390, "Black");
-	
-	canvasContext.fillText("Press ESC to exit", x + 35, y + 440);	
-	
-}
-
-function getKeyNameFromCode(keyCode){
-	if (( keyCode > 64 && keyCode < 91) || ( keyCode > 47 && keyCode < 58) ){
-		return String.fromCharCode(keyCode);
-	}
-	var keyDict = {
-		13: "Return",
-		16: "Shift",
-		17: "Ctrl",
-		18: "Alt",
-		27: "Esc",
-		32: "Space",
-		33: "Pg Up",
-		34: "Pg Dn",
-		35: "End",
-		36: "Home",
-		37: "Left",
-		38: "Up",
-		39: "Right",
-		40: "Down",
-		45: "Insert",
-		46: "Del"	
-		}
-		
-	return (keyDict[keyCode]);
-/*
-	<  - > 188
-	>  - > 190
-	?  - > 191
-	;  - > 186
-	'  - > 222
-	\  - > 220
-	[  - > 219
-	]  - > 221
-	-  - > 189
-	=  - > 187
-	*/
-	
-	
-}
-
-
-function drawSetControlsDisplay(){
-	drawControlsMenu();
-	
-	
-	// A box overlaying the playfield.
-	/*
-	canvasContext.font="15px Arial";
-	canvasContext.fillStyle = "black";
-	
-	canvasContext.fillText("Press the key you would ", 120, 50 );
-	canvasContext.fillText("like to bind to:", 150, 70 );
-	
-	var textX = x + width / 2 - 4*keyBindNames[changeIndex].length;
-	console.log(keyBindNames[changeIndex]);
-	canvasContext.fillText(keyBindNames[changeIndex], textX, 100 );
-	*/
 }
