@@ -48,7 +48,6 @@ function move(){
 
 
 function keyPress(e){
-	console.log(e.keyCode + " " + getKeyNameFromCode(e.keyCode));
 	
 	if(controlsMenu){
 		

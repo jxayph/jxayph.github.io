@@ -83,7 +83,7 @@ function legalPiece(mino){
 	//---
 
 	// Not legal if it's within the current bag being requested.
-	var startIdx = (bag.length % 7) + 1 + Math.floor ((reqBag.length - (bag.length % 7)) / 7) * 7
+	var startIdx = (bag.length % 7) + 1 + Math.floor ((reqBag.length - ((bag.length)% 7 + 1)) / 7) * 7
 	for ( var i = startIdx; i < reqBag.length; i++){
 		if (reqBag[i] == mino){
 			return false;
@@ -116,6 +116,12 @@ function printRequests(){
 }
 
 function addToBag(mino){
+	if (legalPiece(mino)){
+		reqBag.push(mino);
+	}
+}
+
+function addToBagAlt(mino){
 	if( reqBag.length >= bag.length % 7){ // If our requests surpass our current bag
 		
 		var startIdx = (bag.length % 7) + Math.floor ((reqBag.length - (bag.length % 7)) / 7) * 7

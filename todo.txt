@@ -1,0 +1,69 @@
+TODO (Priority at top):
+
+Reset button
+Building mode
+Detailed SRS Display
+Presets (Big-Bang PC mode??)
+Sequence Export
+Sequence Replay
+UI Improvements - Buttons n shit
+Light up cleared lines (Transparency?)
+Hard drop fancy graphics
+
+
+---
+
+FIX BAGEDIT
+ - When requesting the second bag, allows premature termination.
+ 
+ - Add Esc termination without changing the current bag
+
+---
+Detailed SRS/wallkick walkthroug
+ - choosing prettier colours
+ - reverse engineering mode???
+	- Choose a position you want the piece to end at
+	- Software checks all the different starting rotations that could lead to such a position
+	- displays which blocks must be blocked in order for that SRS to work
+
+----------------------	
+
+
+----------------------
+PC opener preset
+
+Allow preset 6set with I piece in hold
+Allow sharing codes for different PC setups, and solutions
+Undo and Redo buttons
+
+------- 
+Sharing solutions (like fumen???)
+
+Array of moves, move object.
+Move object: SD or HD bool
+If SD: Render the path to last pos'n
+
+SD object:
+- For each rotation, log the x,y (x,y values keyed with alphabet)
+- Log the rotation
+E.g. AQ110
+(0,16)CCW CCW CW
+
+Code rendered as string??
+PieceID as int
+X,Y posn as letters corresponding to digit 0-20
+HD bool 0/1
+SD Event as object, find representation later
+/ between moves
+
+Hash to compress string?
+
+<pieceID><FinalPOSn><HD><SD Event queue>/
+
+
+Save each move to an event queue in the export format
+
+Move replays:
+Step by step replays??
+
+---------------------

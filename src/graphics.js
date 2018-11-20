@@ -85,14 +85,7 @@ function drawUI(){
 	// Control scheme
 	
 	canvasContext.font = "15px Arial";
-	canvasContext.fillText("Spawn Mino - Numbers 1 -> 7 (IJLOSTZ)", 10, 525);
-	canvasContext.fillText("Undo / Redo - Q, W", 10, 540);
-	canvasContext.fillText("Hard Drop - Space", 10, 555);
-	canvasContext.fillText("Rotate CCW / CW - Z, X", 10, 570);
-	canvasContext.fillText("Hold - Shift", 10, 585);
-	canvasContext.fillText("Bag arranger - E", 10, 600);
-	canvasContext.fillText("Detailed SRS Toggle - S |  " + detailedSRS, 10, 615);
-	canvasContext.fillText("Toggle Ghost - A", 10, 630);
+	canvasContext.fillText("Detailed SRS Toggle |  " + detailedSRS, 10, 525);
 	canvasContext.fillText("I,J,L,O,S,T,Z", 10, 680);
 	canvasContext.fillText(minoCount, 10, 695);	
 }
