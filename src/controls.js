@@ -61,9 +61,9 @@ function keyPress(e){
 		if(e.keyCode == 27){
 			controlsMenu = false;
 		} else if (e.keyCode == 38){ // menu down
-			keyBindIndex = (keyBindIndex + 12) % 13
+			keyBindIndex = (keyBindIndex + keyBinds.length - 1) % keyBinds.length;
 		} else if (e.keyCode == 40){ // menu up
-			keyBindIndex = (keyBindIndex + 14) % 13
+			keyBindIndex = (keyBindIndex + keyBinds.length + 1) % keyBinds.length;
 		} else if (e.keyCode == 39){
 			setKeyBind = true;
 		}
@@ -173,7 +173,7 @@ function keyPress(e){
 	} else if (e.keyCode == 192){
 		setControls();
 	
-	} else if (e.keyCode == 115){
+	} else if (e.keyCode == keyBinds[13]){
 		resetGame();
 	}{
 		console.log(e.keyCode); // remove after
