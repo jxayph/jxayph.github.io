@@ -11,9 +11,16 @@ Modern Tetris simulator with added features for practicing techniques for multip
  - Mino picker
  - Full keyboard controls
  - Customizable controls
+ - 22 - Tall board
+ - Ugly colour scheme
 
 Planned:
+ - Mino by Mino building mode
+ - 'Reset Game' option
  - Export/Import gamestates
+ - Consistent bag randomizer seeds
+ - More clickable buttons
+ - Less ugliness
  
 Adjust window size using ctrl +/-, reset the board with f5.
 

@@ -13,8 +13,20 @@ function validMove(dX,dY, net){
 	return true;
 }
 
+function resetGame(){
+	initializeBoard();
+	bag = shuffleBag();
+	holdMino = 8;
+	
+	eventLog = [];
+	redoLog  = [];
+	
+	minoCount = [0, 0, 0, 0, 0, 0, 0,]
+	chooseMino();
+}
+
 function inBounds(x, y){
-	return ( (x >= 0 && x < 10)&&( y >= 0 && y < 20) );
+	return ( (x >= 0 && x < 10)&&( y >= 0 && y < 22) );
 }
 
 function validBlock(x, y){
@@ -89,7 +101,7 @@ function hold(){
 function clearLines(){
 	// For every row in the board check if it's ready to clear
 	
-	for (var row = 19; row >=0; row--){
+	for (var row = 21; row >=0; row--){
 		var complete = true;
 		
 		for(var col = 0; col < 10; col++){
@@ -123,7 +135,7 @@ function shiftDown(row){
 
 function initializeBoard(){
 	for (var col = 0; col < 10; col++){
-		board[col] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+		board[col] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 	}
 }
 

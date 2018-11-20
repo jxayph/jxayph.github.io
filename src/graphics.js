@@ -29,12 +29,12 @@ function drawGrid(){
 	var xOffset = 80;
 	var yOffset = 0;
 
-	for (var i = 0; i < 21; i++){
+	for (var i = 2; i < 23; i++){
 		drawRect(0 + xOffset,i*25, 250,1,"black")
 	}
 	
 	for (var i = 0; i < 11; i++){
-		drawRect(i*25 + xOffset, 0, 1, 500, "black")
+		drawRect(i*25 + xOffset, 50, 1, 500, "black")
 	}
 	
 }
@@ -43,9 +43,9 @@ function drawBoard(){
 	var xOffset = 80;
 	var yOffset = 0;
 	
-	drawRect(xOffset,0,250,500, "#283234");
+	drawRect(xOffset,0,251,550, "#283234");
 	
-	for (var row = 0; row < 20; row++){
+	for (var row = 0; row < 22; row++){
 		for (var col = 0; col < 10; col++){
 			if (board[col][row] != 0){
 				drawRect(col*25 + xOffset, row*25, 25, 25, colourKey(board[col][row])); 
@@ -85,7 +85,7 @@ function drawUI(){
 	// Control scheme
 	
 	canvasContext.font = "15px Arial";
-	canvasContext.fillText("Detailed SRS Toggle |  " + detailedSRS, 10, 525);
+	canvasContext.fillText("Detailed SRS Toggle |  " + detailedSRS, 10, 570);
 	canvasContext.fillText("I,J,L,O,S,T,Z", 10, 680);
 	canvasContext.fillText(minoCount, 10, 695);	
 }
@@ -168,12 +168,31 @@ function drawButtons(){
 }
 
 function drawControlsMenu(){
+	
+	var keyBindNames = ["Move left ",
+						"Move right",
+						"Soft drop ",
+						"Move up   ",
+						"Rotate CCW",
+						"Rotate CW ",
+						"Hold mino ",
+						"Hard drop ",
+						"Undo      ",
+						"Redo      ",
+						"Bag editor",
+						"SRS detail",
+						"Show ghost",
+						"Reset game"];//[0-12]
+						
 	var x = 100;
 	var y = 20;
 	var width = 210;
+	var height = keyBindNames.length*30 + 61
 	
-	drawRect(x, y, width, 450, "Black");
-	drawRect(x + 2, y+2, 206, 446, "White");
+	
+	
+	drawRect(x, y, width, height, "Black");
+	drawRect(x + 2, y+2, width - 4, height - 4, "White");
 	
 	
 	// Draw the highlight on a menu item
@@ -187,32 +206,20 @@ function drawControlsMenu(){
 	canvasContext.fillText("Right arrow to", x + 130, y + 15);
 	canvasContext.fillText("assign key", x + 130, y + 25);
 	canvasContext.font = "18px Arial";	
-	var keyBindNames = ["Move left ",
-						"Move right",
-						"Soft drop ",
-						"Move up   ",
-						"Rotate CCW",
-						"Rotate CW ",
-						"Hold mino ",
-						"Hard drop ",
-						"Undo      ",
-						"Redo      ",
-						"Bag editor",
-						"SRS detail",
-						"Show ghost"]; //[0-7]
+	
 						
 						
 	var dY = 30;
-	for (var i = 0; i < 13; i++){
+	for (var i = 0; i < keyBindNames.length; i++){
 		drawRect(x, y + 60 + i*dY, width, 1, "Black");
 		canvasContext.fillText(keyBindNames[i], x + 20, y + 55 + i*dY);
 		canvasContext.fillText(getKeyNameFromCode(keyBinds[i]), x + 140, y + 55 + i*dY);
 		
 	}
 	
-	drawRect (x + 130, y + 30, 1, 390, "Black");
+	drawRect (x + 130, y + 30, 1, height - 60, "Black");
 	
-	canvasContext.fillText("Press ESC to exit", x + 35, y + 440);	
+	canvasContext.fillText("Press ESC to exit", x + 35, y + height - 10);	
 	
 }
 
@@ -236,7 +243,8 @@ function getKeyNameFromCode(keyCode){
 		39: "Right",
 		40: "Down",
 		45: "Insert",
-		46: "Del"	
+		46: "Del",	
+		115: "F4"
 		}
 		
 	return (keyDict[keyCode]);

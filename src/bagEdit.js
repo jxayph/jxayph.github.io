@@ -112,7 +112,11 @@ function printRequests(){
 		canvasContext.fillText(line, 180 - 5 * i, 130 + 20*offset);
 		offset++;
 	}
-	
+}
+
+function cancelBagEdit(){
+	reqBag   = [];
+	bagEdit  = false;
 }
 
 function addToBag(mino){

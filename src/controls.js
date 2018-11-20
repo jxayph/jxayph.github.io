@@ -18,7 +18,7 @@ var controlsMenu = false;
 
 var keyBindIndex = 0;
 var setKeyBind = false;
-var keyBinds = [37, 39, 40, 38, 90, 88, 16, 32, 81, 87, 69, 83, 65]
+var keyBinds = [37, 39, 40, 38, 90, 88, 16, 32, 81, 87, 69, 83, 65, 115]
 
 function move(){
 	var DASFrames = 7;
@@ -98,6 +98,8 @@ function keyPress(e){
 			addToBag(6);
 		} else if (e.keyCode == 13){ // Enter is pressed, terminate bagEdit.
 			endBagEdit();
+		} else if(e.keyCode == 27){
+			cancelBagEdit();
 		}
 		return ;
 	}
@@ -171,7 +173,9 @@ function keyPress(e){
 	} else if (e.keyCode == 192){
 		setControls();
 	
-	} else {
+	} else if (e.keyCode == 115){
+		resetGame();
+	}{
 		console.log(e.keyCode); // remove after
 	
 	}
