@@ -18,7 +18,7 @@ var controlsMenu = false;
 
 var keyBindIndex = 0;
 var setKeyBind = false;
-var keyBinds = [37, 39, 40, 38, 90, 88, 16, 32, 81, 87, 69, 83, 65, 115]
+var keyBinds = [37, 39, 40, 38, 90, 88, 16, 32, 81, 87, 69, 83, 65, 115];
 
 function move(){
 	var DASFrames = 7;
@@ -208,7 +208,7 @@ function getCookie(cname) {
 function loadKeyBinds(){
 	var cookieControls = getCookie("keyBinds");
 	
-	if(keyBinds !=""){
+	if(cookieControls != ""){
 		keyBinds = cookieControls.split(',');
 	} else {
 		saveKeyBinds(30);
