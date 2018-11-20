@@ -16,7 +16,7 @@ Modern Tetris simulator with added features for practicing techniques for multip
 
 Planned:
  - Mino by Mino building mode
- - 'Reset Game' option
+ - Cookies to retain controls
  - Export/Import gamestates
  - Consistent bag randomizer seeds
  - More clickable buttons

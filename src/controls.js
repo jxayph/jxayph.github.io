@@ -59,6 +59,7 @@ function keyPress(e){
 		}
 		
 		if(e.keyCode == 27){
+			saveKeyBinds(30);			
 			controlsMenu = false;
 		} else if (e.keyCode == 38){ // menu down
 			keyBindIndex = (keyBindIndex + keyBinds.length - 1) % keyBinds.length;
@@ -181,6 +182,50 @@ function keyPress(e){
 	}
 	return;
 	
+}
+
+
+function getCookie(cname) {
+	/*var debugCookie = "keyBinds=37,39,40,38,90,88,16,32,81,87,69,83,65,115;expires=expires=Thu, 20 Dec 2018 02:41:52 GMT;path=/";
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(debugCookie);
+    */
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function loadKeyBinds(){
+	var cookieControls = getCookie("keyBinds");
+	
+	if(keyBinds !=""){
+		keyBinds = cookieControls.split(',');
+	} else {
+		saveKeyBinds(30);
+	}
+	
+}
+// keyBinds=37,39,40,38,90,88,16,32,81,87,69,83,65,115;expires=expires=Thu, 20 Dec 2018 02:41:52 GMT;path=/
+
+function saveKeyBinds(days){ // will want to call this on initialization
+
+	// Set the cookie
+	var d = new Date();
+	d.setTime(d.getTime() + days*24*60*60*1000);
+    var expires = "expires="+ d.toUTCString();
+	
+	
+    document.cookie = "keyBinds =" + keyBinds + ";" + expires + ";path=/";
 }
 
 //todo: fix this with keyBinds
