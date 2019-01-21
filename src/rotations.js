@@ -115,9 +115,6 @@ function SRS(net, CW){
 	var offsets = [ ];
 	if ( minoKey == 1){ // Gross I piece offsets.
 		if(CW){
-			/*
-				offsets = [ [], [], [], [], [] ];
-			*/ 
 			if        (rotation == 0){ // Offsets of CW rotation from spawn state.
 				offsets = [ [1, 0], [-1, 0], [2, 0], [-1, 1], [2, -2] ];
 			

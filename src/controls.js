@@ -8,6 +8,7 @@ var DASLeft = 0;
 var DASRight = 0;
 var DASUp = 0;
 var DASDown = 0;
+var holdDrop = false;
 
 var HDDelay = 0;
 
@@ -18,39 +19,12 @@ var controlsMenu = false;
 
 var keyBindIndex = 0;
 var setKeyBind = false;
-var keyBinds = [37, 39, 40, 38, 90, 88, 16, 32, 81, 87, 69, 83, 65, 115];
-
-function move(){
-	var DASFrames = 7;
-	var instantDAS = false;
-	if (holdLeft && (DASLeft == 0 || DASLeft > DASFrames)){
-		while( instantDAS && DASLeft > DASFrames && validMove(-1, 0, minoNet)) minoX--;
-		if (validMove(-1, 0, minoNet)) minoX--;
-	}
-	if (holdRight && (DASRight == 0 || DASRight > DASFrames)){	
-		while( instantDAS && DASRight > DASFrames && validMove(1, 0, minoNet)) minoX++;
-		if (validMove(1, 0, minoNet)) minoX++;
-	}
-	if (holdUp && (DASUp == 0 || DASUp > DASFrames)){
-		while( instantDAS && DASUp > DASFrames && validMove(0, 1, minoNet)) minoY++;
-		if (validMove(0, 1, minoNet)) minoY++;
-	}
-	if (holdDown && (DASDown == 0 || DASDown > DASFrames)){
-		while( instantDAS && DASDown > DASFrames && validMove(0, -1, minoNet)) minoY--;
-		if (validMove(0, -1, minoNet)) minoY--;
-	}
-	
-	if (holdLeft) DASLeft++;
-	if (holdRight) DASRight++;
-	if (holdUp) DASUp++;
-	if (holdDown) DASDown++;
-}
-
+var keyBinds = [37, 39, 40, 38, 90, 88, 16, 32, 81, 87, 69, 83, 65, 115, 113];
 
 function keyPress(e){
 	
 	if(controlsMenu){
-		
+		blinkCounter = 0;
 		if(setKeyBind){
 			console.log("Set key " + e.keyCode);
 			keyBinds[keyBindIndex] = e.keyCode;
@@ -59,7 +33,7 @@ function keyPress(e){
 		}
 		
 		if(e.keyCode == 27){
-			saveKeyBinds(30);			
+			saveKeyBinds(30*365);			
 			controlsMenu = false;
 		} else if (e.keyCode == 38){ // menu down
 			keyBindIndex = (keyBindIndex + keyBinds.length - 1) % keyBinds.length;
@@ -104,7 +78,6 @@ function keyPress(e){
 		}
 		return ;
 	}
-	
 
 	// Numbers 1-7 spawn minos.
 	if (e.keyCode == 49){
@@ -154,7 +127,11 @@ function keyPress(e){
 	
 	} else if (e.keyCode == keyBinds[7]){ // space bar for harddrop
 		hardDrop();
-		HDDelay = 5;
+		
+		if(!holdDrop){ // Set a delay after the first hardDrop.
+			holdDrop = true;
+			HDDelay = 50;
+		}
 	
 	} else if (e.keyCode == keyBinds[8]){//q, w for undo redo
 		undo();
@@ -176,7 +153,16 @@ function keyPress(e){
 	
 	} else if (e.keyCode == keyBinds[13]){
 		resetGame();
-	}{
+		
+	} else if (e.keyCode == keyBinds[14]){
+		bitByBit = !bitByBit;
+		if(bitByBit){
+			minoNet = [[0,0],[0,0],[0,0]];
+		}
+		if(!bitByBit){
+			spawnMino(minoKey - 1);
+		}
+	}else {
 		console.log(e.keyCode); // remove after
 	
 	}
@@ -211,7 +197,7 @@ function loadKeyBinds(){
 	if(cookieControls != ""){
 		keyBinds = cookieControls.split(',');
 	} else {
-		saveKeyBinds(30);
+		saveKeyBinds(30*365);
 	}
 	
 }
@@ -228,7 +214,6 @@ function saveKeyBinds(days){ // will want to call this on initialization
     document.cookie = "keyBinds =" + keyBinds + ";" + expires + ";path=/";
 }
 
-//todo: fix this with keyBinds
 function keyUnpress(e){
 	if (e.keyCode == keyBinds[0]){
 		holdLeft = false;
@@ -244,6 +229,7 @@ function keyUnpress(e){
 		DASDown = 0;
 	} else if (e.keyCode == keyBinds[7]){
 		HDDelay = 0;
+		holdDrop = false;
 	}
 	
 }
@@ -270,10 +256,10 @@ function calculateMousePos(e){
 }
 
 function setControls(){
-	console.log("Set controls");
-	
+		
 	var keyBindIndex = 0;
 	var setKeyBind = false;
+	blinkCounter = 0;
 	
 	
 	controlsMenu = true;

@@ -4,7 +4,7 @@ function draw(){
 	drawBoard();
 	drawButtons();
 	
-	if (!noGhost & !detailStepping) drawGhost();
+	if (!noGhost && !detailStepping && !bitByBit) drawGhost();
 	
 	drawMino();
 	drawGrid();
@@ -14,6 +14,7 @@ function draw(){
 	drawUI();
 	
 	if (controlsMenu){
+		blinkCounter++;
 		drawSetControlsDisplay();	
 	}
 	
@@ -96,10 +97,12 @@ function drawMino(){
 	var yOffset = 0;
 	var x = minoX*25 + xOffset;
 	var y = minoY*25 + yOffset;
-	drawRect(x, y, 25, 25, "Black");
+	
 	for (var n = 0; n < 3; n++){
 		drawRect(x + 25 * minoNet[n][0], y + 25 * minoNet[n][1], 25, 25, colourKey(minoKey));
 	}
+	drawRect(x, y, 25, 25, "Black");
+	if(bitByBit && holdDrop) drawRect(x, y, 25, 25, "White");
 }
 
 function drawHold(){
@@ -144,9 +147,9 @@ function drawSRSGhost(){
 	
 	
 	canvasContext.font = "15px Arial";
-	canvasContext.fillText("Testing offset " + (detailStage), 300, 525);
-	canvasContext.fillText("dX: " + dX + " dY: " + -1*dY, 300, 540);
-	canvasContext.fillText("Press ENTER to skip", 300, 555);
+	canvasContext.fillText("Testing offset " + (detailStage), 300, 575);
+	canvasContext.fillText("dX: " + dX + " dY: " + -1*dY, 300, 590);
+	canvasContext.fillText("Press ENTER to skip", 300, 605);
 	
 	
 	var xOffset = 80;
@@ -182,7 +185,8 @@ function drawControlsMenu(){
 						"Bag editor",
 						"SRS detail",
 						"Show ghost",
-						"Reset game"];//[0-12]
+						"Reset game",
+						"Build mode"];//[0-14]
 						
 	var x = 100;
 	var y = 20;
@@ -195,8 +199,9 @@ function drawControlsMenu(){
 	drawRect(x + 2, y+2, width - 4, height - 4, "White");
 	
 	
-	// Draw the highlight on a menu item
-	drawRect(x + 2 + 129*setKeyBind, y + 31 + 30*keyBindIndex, 10, 29, "red");
+	// Draw the highlight on a menu item, flash on/off every second.
+	if(Math.floor(blinkCounter/30)%2==0)
+		drawRect(x + 2 + 129*setKeyBind, y + 31 + 30*keyBindIndex, 10, 29, "red");
 	
 	canvasContext.font = "25px Arial";
 	drawRect(x, y + 30, width, 2, "Black");
@@ -219,7 +224,7 @@ function drawControlsMenu(){
 	
 	drawRect (x + 130, y + 30, 1, height - 60, "Black");
 	
-	canvasContext.fillText("Press ESC to exit", x + 35, y + height - 10);	
+	canvasContext.fillText("Press Esc to exit", x + 35, y + height - 10);	
 	
 }
 
@@ -244,7 +249,8 @@ function getKeyNameFromCode(keyCode){
 		40: "Down",
 		45: "Insert",
 		46: "Del",	
-		115: "F4"
+		113: "F2",
+		115: "F4"		
 		}
 		
 	return (keyDict[keyCode]);

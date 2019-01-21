@@ -12,7 +12,7 @@
 <script src="src/minoPreviews.js"></script>
 <script src="src/rotations.js"></script>
 <script src="src/button.js"></script>
-
+<script src="src/export.js"></script>
 <script>
 
 var noGhost = false;
@@ -21,9 +21,13 @@ var detailedSRS = false;
 var offsetArray = [];
 var SRSStep = 0;
 
+var bitByBit = false;
+
 var bag = shuffleBag();
 
 var buttons = [];
+
+var blinkCounter = 0;
 
 window.onload = function(){
 	canvas = document.getElementById("gameCanvas");
@@ -38,7 +42,8 @@ window.onload = function(){
 	setInterval(function(){
 		if (bagEdit){
 			bagEditor();
-		}else{
+		}
+		else{
 			move();
 			draw();
 			if(HDDelay > 0)

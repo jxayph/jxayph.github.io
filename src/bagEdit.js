@@ -43,7 +43,7 @@ function printLegalPieces(){
 	canvasContext.fillText(legalPieces, 185 - 5 * numLegal, 90);
 	
 	canvasContext.fillText("Press enter to end the request.", 105, 380);
-	canvasContext.fillText("Press escape to exit.", 135, 400);
+	canvasContext.fillText("Press Esc to exit.", 135, 400);
 }
 
 function legalPiece(mino){
@@ -190,6 +190,7 @@ function endBagEdit(){
 		
 	reqBag = [];
 	bagEdit = false;
+	bitByBit = false;
 	chooseMino();
 
 }

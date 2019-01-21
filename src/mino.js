@@ -35,6 +35,7 @@ function spawnMino(mino){
 		minoNet = [[1, 0], [0, -1], [-1, -1]];
 		minoKey = 7;
 		}
+	bitByBit = false; // disable edit mode if enabled.
 }
 
 function nameKey(key){
@@ -72,5 +73,7 @@ function colourKey(number){
 			return "DarkViolet";
 		} else if (number == 7){
 			return "Red";
+		} else if (number == 8){
+			return "Gray";
 		}
 }

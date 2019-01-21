@@ -1,7 +1,5 @@
 TODO (Priority at top):
 
-Reset button
-Building mode
 Presets (Big-Bang PC mode??)
 Sequence Export
 Sequence Replay

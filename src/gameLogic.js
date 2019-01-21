@@ -1,9 +1,54 @@
-
+function move(){
+	var moved = false;
+	var DASFrames = 7;
+	var instantDAS = false;
+	if (holdLeft && (DASLeft == 0 || DASLeft > DASFrames)){
+		while( instantDAS && DASLeft > DASFrames && validMove(-1, 0, minoNet)) minoX--;
+		if (validMove(-1, 0, minoNet)){
+			minoX--;
+			moved = true;
+		}
+	}
+	if (holdRight && (DASRight == 0 || DASRight > DASFrames)){	
+		while( instantDAS && DASRight > DASFrames && validMove(1, 0, minoNet)) minoX++;
+		if (validMove(1, 0, minoNet)){
+			minoX++;
+			moved = true;
+		}
+	}
+	if (holdUp && (DASUp == 0 || DASUp > DASFrames)){
+		while( instantDAS && DASUp > DASFrames && validMove(0, 1, minoNet)) minoY++;
+		if (validMove(0, 1, minoNet)){
+			minoY++;
+			moved = true;
+		}
+	}
+	if (holdDown && (DASDown == 0 || DASDown > DASFrames)){
+		while( instantDAS && DASDown > DASFrames && validMove(0, -1, minoNet)) minoY--;
+		if (validMove(0, -1, minoNet)){
+			minoY--;
+			moved = true;
+		}
+	}
+	
+	if(holdDrop && bitByBit && moved){
+		if(board[minoX][minoY] == 0) board[minoX][minoY] = 8;
+		else board[minoX][minoY] = 0;
+		return;	
+	}
+	
+	if (holdLeft) DASLeft++;
+	if (holdRight) DASRight++;
+	if (holdUp) DASUp++;
+	if (holdDown) DASDown++;
+}
 function validMove(dX,dY, net){
+	if( bitByBit  && inBounds(minoX + dX, minoY + dY)) return true;
 	if (!inBounds(minoX + dX, minoY + dY) || board[minoX + dX][minoY + dY]){
 		return false;
 	}
 	else{
+		
 		for (var i = 0; i < 3; i++){
 			var x = minoX + dX + net[i][0];
 			var y = minoY + dY + net[i][1];
@@ -52,9 +97,19 @@ function shuffleBag(){
 }
 
 function hardDrop(){
-    HDDelay = 0;
-	if (HDDelay != 0) return;
+	
+	console.log(HDDelay);
+	
+    //HDDelay = 0;
+	if (HDDelay > 0) return;
 	saveState();
+	
+	
+	if(bitByBit){
+		if(board[minoX][minoY] == 0) board[minoX][minoY] = 8;
+		else board[minoX][minoY] = 0;
+		return;
+	}
 	
 	var dropped = false;
 	
