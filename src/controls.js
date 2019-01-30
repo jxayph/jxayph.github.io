@@ -195,7 +195,9 @@ function loadKeyBinds(){
 	var cookieControls = getCookie("keyBinds");
 	
 	if(cookieControls != ""){
-		var savedKeyBinds = console.log(cookieControls.split(','));
+		var savedKeyBinds = cookieControls.split(',');
+		
+		console.log("asdf" + savedKeyBinds);
 		
 		for (var i = 0; i < savedKeyBinds.length; i++){ // Do it like this so as to not overwrite keybinds added in future updates.
 			keyBinds[i] = savedKeyBinds[i]
