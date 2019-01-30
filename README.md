@@ -15,7 +15,6 @@ Modern Tetris simulator with added features for practicing techniques for multip
  - Ugly colour scheme
 
 Planned:
- - Mino by Mino building mode
  - Export/Import gamestates
  - Consistent bag randomizer seeds
  - More clickable buttons
