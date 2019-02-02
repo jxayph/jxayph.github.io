@@ -2,14 +2,14 @@ function move(){
 	var moved = false;
 	var DASFrames = 7;
 	var instantDAS = false;
-	if (holdLeft && (DASLeft == 0 || DASLeft > DASFrames)){
+	if (holdX==1 && (DASLeft == 0 || DASLeft > DASFrames)){
 		while( instantDAS && DASLeft > DASFrames && validMove(-1, 0, minoNet)) minoX--;
 		if (validMove(-1, 0, minoNet)){
 			minoX--;
 			moved = true;
 		}
 	}
-	if (holdRight && (DASRight == 0 || DASRight > DASFrames)){	
+	if (holdX==2 && (DASRight == 0 || DASRight > DASFrames)){
 		while( instantDAS && DASRight > DASFrames && validMove(1, 0, minoNet)) minoX++;
 		if (validMove(1, 0, minoNet)){
 			minoX++;

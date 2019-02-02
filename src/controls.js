@@ -4,6 +4,7 @@ var holdUp = false;
 var holdDown = false;
 
 
+var holdX = 0; // [0,1,2] = [neutral, L, R] 
 var DASLeft = 0;
 var DASRight = 0;
 var DASUp = 0;
@@ -103,10 +104,12 @@ function keyPress(e){
 		
 	// Arrow keys move the minos by default. keybinds[0-6]
 	} else if (e.keyCode == keyBinds[0]){
+		holdX = 1;
 		holdLeft = true;
 	
 	} else if (e.keyCode == keyBinds[1]){
 		holdRight = true;
+		holdX = 2;
 
 	} else if (e.keyCode == keyBinds[2]){
 		holdUp = true;
@@ -197,8 +200,6 @@ function loadKeyBinds(){
 	if(cookieControls != ""){
 		var savedKeyBinds = cookieControls.split(',');
 		
-		console.log("asdf" + savedKeyBinds);
-		
 		for (var i = 0; i < savedKeyBinds.length; i++){ // Do it like this so as to not overwrite keybinds added in future updates.
 			keyBinds[i] = savedKeyBinds[i]
 		}
@@ -222,9 +223,17 @@ function saveKeyBinds(days){ // will want to call this on initialization
 
 function keyUnpress(e){
 	if (e.keyCode == keyBinds[0]){
+		if(holdX == 1){
+			if(holdRight) holdX = 2;
+			else holdX = 0;
+		}
 		holdLeft = false;
 		DASLeft = 0;
 	} else if (e.keyCode == keyBinds[1]){
+		if(holdX == 2){
+			if (holdLeft) holdX = 1;
+			else holdX = 0;
+		}		
 		holdRight = false;
 		DASRight = 0;
 	} else if (e.keyCode == keyBinds[2]){
