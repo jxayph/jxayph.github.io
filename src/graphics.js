@@ -1,3 +1,4 @@
+var blinkCounter = 0; // Red blinker for the menu
 
 function draw(){	
 	drawBackground();
@@ -87,6 +88,7 @@ function drawUI(){
 	
 	canvasContext.font = "15px Arial";
 	canvasContext.fillText("Detailed SRS Toggle |  " + detailedSRS, 10, 570);
+	canvasContext.fillText("Cleaered Lines |  " + clearedLines, 10, 590);
 	canvasContext.fillText("I,J,L,O,S,T,Z", 10, 680);
 	canvasContext.fillText(minoCount, 10, 695);	
 }

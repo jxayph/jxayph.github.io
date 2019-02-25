@@ -7,6 +7,8 @@ var	minoKey = 1;
 var holdMino = 8;
 var rotation = 0;
 
+var bag = shuffleBag();
+
 function spawnMino(mino){
 	minoX = 4;
 	minoY = 1;

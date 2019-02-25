@@ -97,11 +97,7 @@ function shuffleBag(){
 }
 
 function hardDrop(){
-	
-	console.log(HDDelay);
-	
-    //HDDelay = 0;
-	if (HDDelay > 0) return;
+		
 	saveState();
 	
 	
@@ -153,6 +149,8 @@ function hold(){
 	return;
 }
 
+var clearedLines = 0;
+
 function clearLines(){
 	// For every row in the board check if it's ready to clear
 	
@@ -168,6 +166,7 @@ function clearLines(){
 		
 		if (complete){
 			shiftDown(row);
+			clearedLines++;
 			row++;
 		}
 		

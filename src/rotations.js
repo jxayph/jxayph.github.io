@@ -4,6 +4,11 @@ var detailStage = 0;
 var detailCW = null;
 var detailStepping = false;
 
+
+var offsetArray = [];
+var SRSStep = 0;
+
+
 function stepThroughSRS(){
 	var dX = detailOffsets[detailStage][0];
 	var dY = detailOffsets[detailStage][1]

@@ -1,8 +1,8 @@
+// Gamestate globals
 var holdLeft = false;
 var holdRight = false;
 var holdUp = false;
 var holdDown = false;
-
 
 var holdX = 0; // [0,1,2] = [neutral, L, R] 
 var DASLeft = 0;
@@ -11,7 +11,6 @@ var DASUp = 0;
 var DASDown = 0;
 var holdDrop = false;
 
-var HDDelay = 0;
 
 var mouseX = 0;
 var mouseY = 0;
@@ -26,21 +25,21 @@ function keyPress(e){
 	
 	if(controlsMenu){
 		blinkCounter = 0;
-		if(setKeyBind){
+		if(setKeyBind){ // Setting keybinds.
 			console.log("Set key " + e.keyCode);
 			keyBinds[keyBindIndex] = e.keyCode;
 			setKeyBind = false;
 			return;
 		}
 		
-		if(e.keyCode == 27){
+		if(e.keyCode == 27){ // Escape key
 			saveKeyBinds(30*365);			
 			controlsMenu = false;
 		} else if (e.keyCode == 38){ // menu down
 			keyBindIndex = (keyBindIndex + keyBinds.length - 1) % keyBinds.length;
 		} else if (e.keyCode == 40){ // menu up
 			keyBindIndex = (keyBindIndex + keyBinds.length + 1) % keyBinds.length;
-		} else if (e.keyCode == 39){
+		} else if (e.keyCode == 39){ // Right arrow, navigates to set key
 			setKeyBind = true;
 		}
 		return;
@@ -51,7 +50,7 @@ function keyPress(e){
 		stepThroughSRS();
 		return;
 	}
-	if(bagEdit){
+	if(bagEdit){ //TODO: Backspace to remove from bag
 		       if (e.keyCode == 49 || e.keyCode == 73){
 			addToBag(0);
 		
@@ -133,7 +132,6 @@ function keyPress(e){
 		
 		if(!holdDrop){ // Set a delay after the first hardDrop.
 			holdDrop = true;
-			HDDelay = 50;
 		}
 	
 	} else if (e.keyCode == keyBinds[8]){//q, w for undo redo
@@ -175,10 +173,6 @@ function keyPress(e){
 
 
 function getCookie(cname) {
-	/*var debugCookie = "keyBinds=37,39,40,38,90,88,16,32,81,87,69,83,65,115;expires=expires=Thu, 20 Dec 2018 02:41:52 GMT;path=/";
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(debugCookie);
-    */
     var name = cname + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
     var ca = decodedCookie.split(';');
@@ -208,7 +202,6 @@ function loadKeyBinds(){
 	}
 	
 }
-// keyBinds=37,39,40,38,90,88,16,32,81,87,69,83,65,115;expires=expires=Thu, 20 Dec 2018 02:41:52 GMT;path=/
 
 function saveKeyBinds(days){ // will want to call this on initialization
 
@@ -243,14 +236,13 @@ function keyUnpress(e){
 		holdDown = false;
 		DASDown = 0;
 	} else if (e.keyCode == keyBinds[7]){
-		HDDelay = 0;
 		holdDrop = false;
 	}
 	
 }
 
 
-function onClick(e){
+function onClick(e){ // lacking support; remove?
 	console.log(mouseX);
 	console.log(mouseY);
 	
@@ -271,6 +263,7 @@ function calculateMousePos(e){
 }
 
 function setControls(){
+	// Initializes variable state for setting controls. Logic happens elsewhere.
 		
 	var keyBindIndex = 0;
 	var setKeyBind = false;

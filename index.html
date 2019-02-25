@@ -15,19 +15,12 @@
 <script src="src/export.js"></script>
 <script>
 
+// Flag toggle globals
 var noGhost = false;
-
-var detailedSRS = false;
-var offsetArray = [];
-var SRSStep = 0;
-
 var bitByBit = false;
-
-var bag = shuffleBag();
+var detailedSRS = false;
 
 var buttons = [];
-
-var blinkCounter = 0;
 
 window.onload = function(){
 	canvas = document.getElementById("gameCanvas");
@@ -37,17 +30,15 @@ window.onload = function(){
 	initializeButtons()
 	chooseMino();
 	
-	const FPS=60;
+	const FPS = 60;
 		
 	setInterval(function(){
-		if (bagEdit){
+		if (bagEdit){ // Flag for the bag editor UI
 			bagEditor();
 		}
-		else{
+		else{ // Main gamelogic loop
 			move();
 			draw();
-			if(HDDelay > 0)
-				HDDelay--;
 			}
 		}, 1000/FPS);
 	

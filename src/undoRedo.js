@@ -5,11 +5,14 @@ function saveState(){
 	// Reset the redoLog to nothing since we're branching off
 	redoLog = [];
 	
-	// Push the gamestate to the eventLog. eventLog is limited to the last 96 moves.
-	if(eventLog.length > 96){
+	// Push the gamestate to the eventLog. eventLog is limited to the last 140 moves.
+	if(eventLog.length > 140){
 		eventLog.shift();
 	}
-	eventLog.push( new GameState());
+	var newState = new GameState;
+	console.log(newState.bag);
+	eventLog.push(newState);
+	
 
 }
 
@@ -32,13 +35,27 @@ function undo(){
 	redoLog.push(new GameState);
 	
 	
-	var gameState = eventLog.pop();
+	var gameState = eventLog.pop(); // Retrieve gamestate.
+	
+	var oldBag = gameState.bag;
+	var prevHold = gameState.holdMino;
+	
+	bag.push(oldBag[oldBag.length-1]); // Restore the last item from the most recent bag to the restored bag.
+	if(prevHold == 8 && holdMino!=8){ // Avoid losing a mino upon the first hold.
+		bag.push(oldBag[oldBag.length-2]); 
+	} 
+	
+	// Restore active mino
+	console.log(minoKey);
 	minoKey = gameState.mino;
 	spawnMino(minoKey - 1);
+	
 	holdMino = gameState.holdMino;
 	board = gameState.board;
-	bag = gameState.bag;
 	
+	
+	//console.log(oldBag);
+	console.log(bag);
 	// Debug info
 	minoCount[minoKey-1]--;
 	
