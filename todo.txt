@@ -7,6 +7,15 @@ UI Improvements - Buttons n shit
 Light up cleared lines (Transparency?)
 Hard drop fancy graphics
 
+---
+
+Big Bang Style Finesse Practice
+ - Track finesse faults;
+ - procedurally generate board states based on which finesse faults are most common
+
+ - gamemode for finesse practice
+   - You're shown the ghost for where you have to place the next piece, when you place it it clears all rows that the piece occupies
+   - Will attempt to generate an even spread of placements initially, but after calibration will show the ones you fault on more often.
 
 ---
 
@@ -15,6 +24,7 @@ FIX BAGEDIT
  
  - Add Esc termination without changing the current bag
 
+ 
 ---
 Detailed SRS/wallkick walkthroug
  - choosing prettier colours

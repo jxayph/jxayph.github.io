@@ -4,7 +4,7 @@ Modern Tetris simulator with added features for practicing techniques for multip
 
 # Features:
  - 7-bag randomizer
- - SRS
+ - Guideline SRS
  - Undo/Redo buttons
  - 7-bag legal Bag editor
  - SRS Wallkick Illustrator
@@ -16,7 +16,6 @@ Modern Tetris simulator with added features for practicing techniques for multip
 
 Planned:
  - Export/Import gamestates
- - Consistent bag randomizer seeds
  - More clickable buttons
  - Less ugliness
  

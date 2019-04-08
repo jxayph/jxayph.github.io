@@ -19,9 +19,8 @@ var controlsMenu = false;
 
 var keyBindIndex = 0;
 var setKeyBind = false;
-var keyBinds = [37, 39, 40, 38, 90, 88, 16, 32, 81, 87, 69, 83, 65, 115, 113];
 
-function keyPress(e){
+function keyPress(e, mino, keyBinds, drawState){
 	
 	if(controlsMenu){
 		blinkCounter = 0;
@@ -33,7 +32,7 @@ function keyPress(e){
 		}
 		
 		if(e.keyCode == 27){ // Escape key
-			saveKeyBinds(30*365);			
+			saveKeyBinds(30*365, keyBinds);			
 			controlsMenu = false;
 		} else if (e.keyCode == 38){ // menu down
 			keyBindIndex = (keyBindIndex + keyBinds.length - 1) % keyBinds.length;
@@ -45,7 +44,7 @@ function keyPress(e){
 		return;
 	}
 	
-	if (detailStepping){
+	if (detailStepping){ // Detailed SRS walkthrough
 		if (e.keyCode == 13) detailStage = detailOffsets.length -1
 		stepThroughSRS();
 		return;
@@ -78,8 +77,12 @@ function keyPress(e){
 		}
 		return ;
 	}
+	
+	if(e.keyCode > 48 && e.keyCode < 56){ // Keys 1-7 spawn minos.
+		mino.spawnMino(e.keyCode - 48);
+	}
 
-	// Numbers 1-7 spawn minos.
+	// Numbers 1-7 spawn minos. //TODO: REMOVE AND CONVERT TO OBJECT
 	if (e.keyCode == 49){
 		spawnMino(0);
 		
@@ -117,11 +120,11 @@ function keyPress(e){
 		holdDown = true;
 	
 	} else if (e.keyCode == keyBinds[4]){ // z and x for rotations by default.
-		if(detailedSRS) detailedSpinMino(false);
+		if(drawState.SRS) detailedSpinMino(false);
 		else spinMino(false);
 	
 	} else if (e.keyCode == keyBinds[5]){
-		if (detailedSRS) detailedSpinMino(true);
+		if (drawState.SRS) detailedSpinMino(true);
 		else spinMino(true);
 	
 	} else if (e.keyCode == keyBinds[6]){ // shift for hold
@@ -144,10 +147,10 @@ function keyPress(e){
 		bagEdit = true;
 	
 	} else if (e.keyCode == keyBinds[11]){
-		detailedSRS = !detailedSRS;
+		drawState.SRS = !drawState.SRS;
 	
 	} else if (e.keyCode == keyBinds[12]){
-		noGhost = !noGhost;
+		drawState.ghost = !drawState.ghost;
 		
 	} else if (e.keyCode == 192){
 		setControls();
@@ -188,7 +191,7 @@ function getCookie(cname) {
     return "";
 }
 
-function loadKeyBinds(){
+function loadKeyBinds(keyBinds){
 	var cookieControls = getCookie("keyBinds");
 	
 	if(cookieControls != ""){
@@ -203,7 +206,7 @@ function loadKeyBinds(){
 	
 }
 
-function saveKeyBinds(days){ // will want to call this on initialization
+function saveKeyBinds(days, keyBinds){ // will want to call this on initialization
 
 	// Set the cookie
 	var d = new Date();
@@ -214,7 +217,7 @@ function saveKeyBinds(days){ // will want to call this on initialization
     document.cookie = "keyBinds =" + keyBinds + ";" + expires + ";path=/";
 }
 
-function keyUnpress(e){
+function keyUnpress(e, mino, keyBinds){
 	if (e.keyCode == keyBinds[0]){
 		if(holdX == 1){
 			if(holdRight) holdX = 2;
@@ -242,6 +245,8 @@ function keyUnpress(e){
 }
 
 
+
+
 function onClick(e){ // lacking support; remove?
 	console.log(mouseX);
 	console.log(mouseY);
@@ -263,7 +268,7 @@ function calculateMousePos(e){
 }
 
 function setControls(){
-	// Initializes variable state for setting controls. Logic happens elsewhere.
+	// Initializes variable state for setting controls. Logic happens else2h
 		
 	var keyBindIndex = 0;
 	var setKeyBind = false;

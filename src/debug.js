@@ -26,3 +26,8 @@ function bagTest(num, mino){
 	return countArray;
 
 }
+
+var testThing; // delet this
+function thingy(){
+	
+}

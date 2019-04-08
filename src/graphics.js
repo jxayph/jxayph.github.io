@@ -1,22 +1,22 @@
 var blinkCounter = 0; // Red blinker for the menu
 
-function draw(){	
+function draw(keyBinds, drawState){	
 	drawBackground();
 	drawBoard();
 	drawButtons();
 	
-	if (!noGhost && !detailStepping && !bitByBit) drawGhost();
+	if (drawState.ghost && !detailStepping && !bitByBit) drawGhost();
 	
 	drawMino();
 	drawGrid();
 	
 	if (detailStepping && minoKey != 4) drawSRSGhost();
 	
-	drawUI();
+	drawUI(drawState);
 	
 	if (controlsMenu){
 		blinkCounter++;
-		drawSetControlsDisplay();	
+		drawSetControlsDisplay(keyBinds);	
 	}
 	
 }
@@ -67,7 +67,7 @@ function drawBackground(){
 	//drawRect(0,0,canvas.width,canvas.height, "#283234");
 }
 
-function drawUI(){	
+function drawUI(drawState){	
 	drawHold();
 	drawPreview();
 	canvasContext.fillStyle = "black";
@@ -87,7 +87,7 @@ function drawUI(){
 	// Control scheme
 	
 	canvasContext.font = "15px Arial";
-	canvasContext.fillText("Detailed SRS Toggle |  " + detailedSRS, 10, 570);
+	canvasContext.fillText("Detailed SRS Toggle |  " + drawState.SRS, 10, 570);
 	canvasContext.fillText("Cleaered Lines |  " + clearedLines, 10, 590);
 	canvasContext.fillText("I,J,L,O,S,T,Z", 10, 680);
 	canvasContext.fillText(minoCount, 10, 695);	
@@ -172,7 +172,7 @@ function drawButtons(){
 	}
 }
 
-function drawControlsMenu(){
+function drawControlsMenu(keyBinds){
 	
 	var keyBindNames = ["Move left ",
 						"Move right",
@@ -273,8 +273,8 @@ function getKeyNameFromCode(keyCode){
 }
 
 
-function drawSetControlsDisplay(){
-	drawControlsMenu();
+function drawSetControlsDisplay(keyBinds){
+	drawControlsMenu(keyBinds);
 	
 	
 	// A box overlaying the playfield.

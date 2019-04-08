@@ -16,16 +16,41 @@
 <script>
 
 // Flag toggle globals
-var noGhost = false;
 var bitByBit = false;
-var detailedSRS = false;
 
-var buttons = [];
+var buttons = []; // clickable buttons
 
 window.onload = function(){
+
+	var drawState = { // Flags for what gets drawn in which states
+		ghost: true,
+		SRS:false
+	};
+	
+	var controlState = { // Tracks the state of physical controls.
+		xDir: 0, // [0,1,2] = [neutral, L, R] 
+		holdLeft: false,
+		holdRight: false,
+		holdUp: false,
+		holdDown: false,
+		holdDrop: false
+	};
+	
+	var DAS = { // Tracks the state of DAS/ARR
+		left: 0,
+		right: 0,
+		up: 0,
+		down: 0
+	};
+	
+
+	var keyBinds = [37, 39, 40, 38, 90, 88, 16, 32, 81, 87, 69, 83, 65, 115, 113];
+	
+	var mino = new Mino();
+	
 	canvas = document.getElementById("gameCanvas");
 	canvasContext = canvas.getContext('2d');
-	loadKeyBinds();
+	loadKeyBinds(keyBinds);
 	initializeBoard();
 	initializeButtons()
 	chooseMino();
@@ -38,19 +63,24 @@ window.onload = function(){
 		}
 		else{ // Main gamelogic loop
 			move();
-			draw();
+			draw(keyBinds, drawState);
 			}
 		}, 1000/FPS);
+	window.addEventListener('keydown', function(e){
+		keyPress(e, mino, keyBinds, drawState);
+	});
 	
-	window.addEventListener('keydown', keyPress);
-	window.addEventListener('keyup', keyUnpress);
-
+	window.addEventListener('keyup', function(e){
+		keyUnpress(e, mino, keyBinds);
+	});
+	
+	// mouse stuff, might remove???
 	canvas.addEventListener('mousedown',onClick);
 	canvas.addEventListener('mousemove',
 		function(e){
 			var mousePos = calculateMousePos(e);
-			mouseX=mousePos.x;
-			mouseY=mousePos.y;
+			mouseX = mousePos.x;
+			mouseY = mousePos.y;
 		});
 }
 

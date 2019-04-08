@@ -26,7 +26,12 @@ function GameState(){
 		this.board[i] = board[i].slice();
 	}
 }
-
+function thing(){
+	loadBoard("8AfwNMYDO")
+	bag=[0,1,5,5,0,6,5,0]
+	spawnMino(bag.pop())
+	holdMino=8;
+}
 function undo(){
 	
 	if (eventLog.length == 0) return;
@@ -40,8 +45,27 @@ function undo(){
 	var oldBag = gameState.bag;
 	var prevHold = gameState.holdMino;
 	
+	/*
+	[I Z J L O T S] place IZ [JLOTS]
+	edit to [LTOSJ]
+	undo
+	J gets sent into queue instead of L????
+	
+	
+	*/
+	
+	
+	
 	bag.push(oldBag[oldBag.length-1]); // Restore the last item from the most recent bag to the restored bag.
 	if(prevHold == 8 && holdMino!=8){ // Avoid losing a mino upon the first hold.
+		//BREAKS UPON BAGEDIT
+		
+		/*
+		Make some moves
+		Edit the bag
+		Undo before making a move 
+		fucks it up
+		*/
 		bag.push(oldBag[oldBag.length-2]); 
 	} 
 	
