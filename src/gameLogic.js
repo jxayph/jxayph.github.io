@@ -97,7 +97,7 @@ function shuffleBag(){
 }
 
 function hardDrop(){
-		
+	
 	saveState();
 	
 	
@@ -125,6 +125,7 @@ function hardDrop(){
 	minoCount[minoKey - 1]++; // Debug info
 	clearLines();
 	chooseMino();
+	wasHeld = false; // Reset hold flag used in undo/redo.
 }
 
 function chooseMino(){
@@ -137,6 +138,7 @@ function chooseMino(){
 }
 
 function hold(){
+	wasHeld = !wasHeld;
 	if (holdMino == 8){ // If the hold is empty, simply set the hold and spawn a new mino.
 		holdMino = minoKey;
 		chooseMino();

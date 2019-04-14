@@ -167,7 +167,7 @@ function keyPress(e, mino, keyBinds, drawState){
 			spawnMino(minoKey - 1);
 		}
 	}else {
-		console.log(e.keyCode); // remove after
+		//console.log(e.keyCode); // remove after
 	
 	}
 	return;

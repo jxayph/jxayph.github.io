@@ -1,5 +1,6 @@
 var eventLog=[];
 var redoLog = [];
+var wasHeld = false;
 
 function saveState(){
 	// Reset the redoLog to nothing since we're branching off
@@ -10,7 +11,6 @@ function saveState(){
 		eventLog.shift();
 	}
 	var newState = new GameState;
-	console.log(newState.bag);
 	eventLog.push(newState);
 	
 
@@ -21,6 +21,7 @@ function GameState(){
 	this.bag = bag.slice();
 	this.holdMino = holdMino;
 	this.board = Array(10);
+	this.held = wasHeld;
 
 	for (var i = 0; i < 10; i++){
 		this.board[i] = board[i].slice();
@@ -36,53 +37,58 @@ function undo(){
 	
 	if (eventLog.length == 0) return;
 	
+	
+	
 	// Save the current state into the redoLog.
 	redoLog.push(new GameState);
 	
+	var gameState = eventLog.pop(); // Retrieve previous gamestate.
 	
-	var gameState = eventLog.pop(); // Retrieve gamestate.
-	
-	var oldBag = gameState.bag;
 	var prevHold = gameState.holdMino;
+	var prevHeld = gameState.held;
 	
-	/*
-	[I Z J L O T S] place IZ [JLOTS]
-	edit to [LTOSJ]
-	undo
-	J gets sent into queue instead of L????
+	if(wasHeld && holdMino!=8){ // Undo any holds made this turn.
+		var temp = holdMino;
+		holdMino = minoKey;
+		minoKey = temp;
+		wasHeld = false;
+	} else {
+		wasHeld = prevHeld;
+	}
 	
+	// Special logic for restoring the bag/hold/current minos.
+	if( eventLog.length > 1 && eventLog[eventLog.length-1].holdMino == 8 && holdMino != 8){ // If we're undoing the first hold...
+		console.log("case1");
+		if (!prevHeld) { // If the player pressed hold twice...
+			console.log("case1a");
+			bag.push(gameState.mino - 1);
+			bag.push(minoKey - 1);
+			holdMino = 8;
+			minoKey = gameState.holdMino;
+		} else{
+			bag.push(minoKey - 1);
+			bag.push(gameState.mino - 1);
+			holdMino = 8;
+			minoKey = gameState.holdMino;
+		}
+	} else	if(prevHeld){ // If a mino was held in the last state...
+		console.log("case2");
+		bag.push(minoKey-1);
+		minoKey = gameState.mino;
+		holdMino = prevHold;
+	} else{
+		console.log("case3");
+		bag.push(minoKey-1);
+		minoKey = gameState.mino;
+		holdMino = prevHold;
+	}
 	
-	*/
-	
-	
-	
-	bag.push(oldBag[oldBag.length-1]); // Restore the last item from the most recent bag to the restored bag.
-	if(prevHold == 8 && holdMino!=8){ // Avoid losing a mino upon the first hold.
-		//BREAKS UPON BAGEDIT
-		
-		/*
-		Make some moves
-		Edit the bag
-		Undo before making a move 
-		fucks it up
-		*/
-		bag.push(oldBag[oldBag.length-2]); 
-	} 
-	
-	// Restore active mino
-	console.log(minoKey);
-	minoKey = gameState.mino;
-	spawnMino(minoKey - 1);
-	
-	holdMino = gameState.holdMino;
 	board = gameState.board;
+	spawnMino(minoKey-1);
 	
-	
-	//console.log(oldBag);
-	console.log(bag);
+
 	// Debug info
-	minoCount[minoKey-1]--;
-	
+	minoCount[minoKey-1]--; // broken
 	
 }
 
@@ -90,18 +96,20 @@ function redo(){
 	if (redoLog.length == 0) return;
 
 	// Save state to eventLog before redoing
-	eventLog.push( new GameState);
+	eventLog.push(new GameState);
 	var gameState = redoLog.pop();
 
 	// Debug info
 	minoCount[minoKey - 1]++;	
 	
 	// restore state.
+	console.log(gameState);
 	minoKey = gameState.mino;
 	spawnMino(minoKey - 1);
 	holdMino = gameState.holdMino;
 	board = gameState.board;
 	bag = gameState.bag;
+	wasHeld = gameState.held;
 	
 	
 	
