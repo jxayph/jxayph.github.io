@@ -33,62 +33,39 @@ function thing(){
 	spawnMino(bag.pop())
 	holdMino=8;
 }
+
 function undo(){
 	
-	if (eventLog.length == 0) return;
+	if (eventLog.length == 0) return; // Nothing to undo.
 	
-	
-	
-	// Save the current state into the redoLog.
 	redoLog.push(new GameState);
 	
-	var gameState = eventLog.pop(); // Retrieve previous gamestate.
+	var prevState = eventLog.pop();
 	
-	var prevHold = gameState.holdMino;
-	var prevHeld = gameState.held;
-	
-	if(wasHeld && holdMino!=8){ // Undo any holds made this turn.
-		var temp = holdMino;
-		holdMino = minoKey;
-		minoKey = temp;
-		wasHeld = false;
-	} else {
-		wasHeld = prevHeld;
-	}
-	
-	// Special logic for restoring the bag/hold/current minos.
-	if( eventLog.length > 1 && eventLog[eventLog.length-1].holdMino == 8 && holdMino != 8){ // If we're undoing the first hold...
-		console.log("case1");
-		if (!prevHeld) { // If the player pressed hold twice...
-			console.log("case1a");
-			bag.push(gameState.mino - 1);
+	if(wasHeld){//was held
+		 if (prevState.holdMino == 8 && holdMino != 8){
 			bag.push(minoKey - 1);
+			bag.push(holdMino - 1);
 			holdMino = 8;
-			minoKey = gameState.holdMino;
-		} else{
-			bag.push(minoKey - 1);
-			bag.push(gameState.mino - 1);
-			holdMino = 8;
-			minoKey = gameState.holdMino;
+			minoKey = prevState.mino;
+			wasHeld = false;
+		 } else { // not the first hold
+			hold();
+			bag.push(minoKey-1);
+			minoKey = prevState.mino;
 		}
-	} else	if(prevHeld){ // If a mino was held in the last state...
-		console.log("case2");
+	} else {
 		bag.push(minoKey-1);
-		minoKey = gameState.mino;
-		holdMino = prevHold;
-	} else{
-		console.log("case3");
-		bag.push(minoKey-1);
-		minoKey = gameState.mino;
-		holdMino = prevHold;
+		minoKey = prevState.mino;
 	}
-	
-	board = gameState.board;
 	spawnMino(minoKey-1);
 	
+	board = prevState.board;
+	wasHeld = prevState.held;	
 
 	// Debug info
-	minoCount[minoKey-1]--; // broken
+	minoCount[minoKey-1]--;
+	
 	
 }
 
@@ -112,5 +89,5 @@ function redo(){
 	wasHeld = gameState.held;
 	
 	
-	
+	console.log("Was held = " + wasHeld);
 }

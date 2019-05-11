@@ -88,7 +88,7 @@ function drawUI(drawState){
 	
 	canvasContext.font = "15px Arial";
 	canvasContext.fillText("Detailed SRS Toggle |  " + drawState.SRS, 10, 570);
-	canvasContext.fillText("Cleaered Lines |  " + clearedLines, 10, 590);
+	canvasContext.fillText("Cleared Lines |  " + clearedLines, 10, 590);
 	canvasContext.fillText("I,J,L,O,S,T,Z", 10, 680);
 	canvasContext.fillText(minoCount, 10, 695);	
 }
